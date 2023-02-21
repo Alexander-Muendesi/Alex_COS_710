@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-
 /**
-    * DataReader is a class for processing the dataset in batches of 10 
+    * DataReader is a class for processing the dataset in batches of 50 
  */
 public class DataReader {
     private String filename;
     private LinkedHashSet<Map<String, Double>> dataSet;
+    private final int batchSize = 50;
 
     /**
      * @param filename The location of the .csv file being read. Use absolute path from the Project Root
@@ -22,15 +22,16 @@ public class DataReader {
     }
 
     /**
-     * @brief This method reads the data from the file and sends it for processing in batches of 10.
+     * @brief This method reads the data from the file and sends it for processing in batches of 50.
      *          I am thinking it should take a parameter which is a class that does something with the data
      */
     public void readData(){
         try(BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line= "";
+            // double count = 0;
 
             reader.readLine();//skip this line as it contains only column names
-            int numItems = 0;
+
             while((line = reader.readLine()) != null){
                 String[] vals = line.split(",");
                 Map<String, Double> row = new HashMap<>();
@@ -63,19 +64,18 @@ public class DataReader {
 
                 dataSet.add(row);
 
-                numItems++;
-
-                if(numItems == 10){
-                    //************************************************** */
+                if(dataSet.size() == batchSize){
                     //call a method of some class to do some work on the current batch of 10 before moving to another batch
-                    //************************************************** */
 
                     dataSet.clear();//remove all references from the data structure
                     dataSet = null;
                     dataSet = new LinkedHashSet<Map<String, Double>>();
                     System.gc();//Force Garbage collector to run
-                    numItems = 0;
                 }
+
+                // if(count % 200000 == 0){System.out.println(count);}
+                // if(count > 9600000){System.out.println(count);}
+                // count++;
             }
 
         }
@@ -85,4 +85,5 @@ public class DataReader {
 
         }
     }
+
 }
