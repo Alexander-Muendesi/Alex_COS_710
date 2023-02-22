@@ -27,40 +27,37 @@ public class DataReader {
      */
     public void readData(){
         try(BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String[] keys = {
+                "Duration","Distance","PLong","PLatd","DLong","DLatd","Haversine","Pmonth","PDay",
+                "Phour","Pmin","PDWeek","Dmonth","Dday","Dhour","Dmin","DDweek","Temp",
+                "Precip","Wind","Humid","Solar","Snow","GroundTemp","Dust"
+            };
             String line= "";
-            // double count = 0;
 
             reader.readLine();//skip this line as it contains only column names
 
             while((line = reader.readLine()) != null){
-                String[] vals = line.split(",");
+                int startIndex = 0;
+                int endIndex = line.indexOf(',');
+                int keyCounter = 0;
+                Boolean skipFirstColumn = true;
                 Map<String, Double> row = new HashMap<>();
-                int counter = 1;//starting at index 1 because index 0 is just line number
 
-                row.put("Duration", Double.parseDouble(vals[counter++]));
-                row.put("Distance", Double.parseDouble(vals[counter++]));
-                row.put("PLong", Double.parseDouble(vals[counter++]));
-                row.put("PLatd", Double.parseDouble(vals[counter++]));
-                row.put("DLong", Double.parseDouble(vals[counter++]));
-                row.put("Haversine", Double.parseDouble(vals[counter++]));
-                row.put("Pmonth", Double.parseDouble(vals[counter++]));
-                row.put("Pday", Double.parseDouble(vals[counter++]));
-                row.put("Phour", Double.parseDouble(vals[counter++]));
-                row.put("Pmin", Double.parseDouble(vals[counter++]));
-                row.put("PDWeek", Double.parseDouble(vals[counter++]));
-                row.put("Dmonth", Double.parseDouble(vals[counter++]));
-                row.put("Dday", Double.parseDouble(vals[counter++]));
-                row.put("Dhour", Double.parseDouble(vals[counter++]));
-                row.put("Dmin", Double.parseDouble(vals[counter++]));
-                row.put("DDweek", Double.parseDouble(vals[counter++]));
-                row.put("Temp", Double.parseDouble(vals[counter++]));
-                row.put("Precip", Double.parseDouble(vals[counter++]));
-                row.put("Wind", Double.parseDouble(vals[counter++]));
-                row.put("Humid", Double.parseDouble(vals[counter++]));
-                row.put("Solar", Double.parseDouble(vals[counter++]));
-                row.put("Snow", Double.parseDouble(vals[counter++]));
-                row.put("GroundTemp", Double.parseDouble(vals[counter++]));
-                row.put("Dust", Double.parseDouble(vals[counter++]));
+                while(endIndex >= 0){
+                    if(!skipFirstColumn){
+                        String elem = line.substring(startIndex, endIndex);
+                        row.put(keys[keyCounter++],Double.parseDouble(elem));
+                        startIndex = endIndex+1;
+                        endIndex = line.indexOf(",", startIndex);
+                    }
+                    else{
+                        startIndex = endIndex+1;
+                        endIndex = line.indexOf(",", startIndex);
+                        skipFirstColumn = false;
+                    }
+                }
+                String elem = line.substring(startIndex);
+                row.put(keys[keyCounter],Double.parseDouble(elem));//process last element
 
                 dataSet.add(row);
 
@@ -76,6 +73,7 @@ public class DataReader {
 
             if(!dataSet.isEmpty()){//read whatever is left in the dataset 
                 //call a method to perform operations on the dataset
+                
                 dataSet.clear();
                 dataSet = null;
                 System.gc();
