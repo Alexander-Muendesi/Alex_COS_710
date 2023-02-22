@@ -72,10 +72,13 @@ public class DataReader {
                     dataSet = new LinkedHashSet<Map<String, Double>>();
                     System.gc();//Force Garbage collector to run
                 }
+            }
 
-                // if(count % 200000 == 0){System.out.println(count);}
-                // if(count > 9600000){System.out.println(count);}
-                // count++;
+            if(!dataSet.isEmpty()){//read whatever is left in the dataset 
+                //call a method to perform operations on the dataset
+                dataSet.clear();
+                dataSet = null;
+                System.gc();
             }
 
         }
