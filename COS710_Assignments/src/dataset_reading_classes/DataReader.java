@@ -11,7 +11,7 @@ import java.util.Map;
 public class DataReader {
     private String filename;
     private LinkedHashSet<Map<String, Double>> dataSet;
-    private final int batchSize = 50;
+    private final int batchSize = 100000;
 
     /**
      * @param filename The location of the .csv file being read. Use absolute path from the Project Root
@@ -43,7 +43,7 @@ public class DataReader {
                 Boolean skipFirstColumn = true;
                 Map<String, Double> row = new HashMap<>();
 
-                while(endIndex >= 0){
+                while(endIndex >= 0){//this innner while loop is meant to replace the .split method which is inefficient
                     if(!skipFirstColumn){
                         String elem = line.substring(startIndex, endIndex);
                         row.put(keys[keyCounter++],Double.parseDouble(elem));
