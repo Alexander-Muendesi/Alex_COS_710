@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import gp.GeneticProgram;
+
 /**
     * DataReader is a class for processing the dataset in batches of 50 
  */
@@ -24,8 +26,11 @@ public class DataReader {
     /**
      * @brief This method reads the data from the file and sends it for processing in batches of 50.
      *          I am thinking it should take a parameter which is a class that does something with the data
+     * You then want to generate an individual and store it in the population array. Then you want to apply the whole training dataset
+     * to the program/tree and store the results somewhere. This might cause some memory issues but you'll have to see. Could potentially
+     * write the results to a file if you cannot store everything in memory. Also to save memory you can lower population size
      */
-    public void readData(){
+    public void readData(GeneticProgram gp){
         try(BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String[] keys = {
                 "Duration","Distance","PLong","PLatd","DLong","DLatd","Haversine","Pmonth","PDay",
