@@ -1,12 +1,16 @@
 package gp;
 
 public class FunctionNode extends Node {
-    private final int index;//basically we will functions in a string array. This index identifies that function
+    private final int index;//basically we will have functions in a string array. This index identifies that function
     private Node[] arguments;//this will be the arguments of the function
     private final int numArguments = 2;//for now we are dealing with the binary arithmetic operators
+    private final int leftChildIndex = 0;
+    private final int rightChildIndex = 1;
+    public final int depth;//temporary maybe for printing purposes
 
-    public FunctionNode(int index){
+    public FunctionNode(int index, int depth){
         this.index = index;
+        this.depth = depth;
         arguments = new Node[numArguments];
     }
 
@@ -61,6 +65,33 @@ public class FunctionNode extends Node {
             default:
                 throw new Exception("Invalid index provided: " + index);
         }
+    }
+
+    /**
+     * 
+     * @return The value of the operator as a string
+     */
+    public String getValue() throws Exception{
+        switch (index) {
+            case 0:
+                return "+";
+            case 1:
+                return "-";
+            case 2:
+                return "*";
+            case 3:
+                return "/";
+            default:
+                throw new Exception("Invalid index of Terminal Node: " + index);
+        }
+    }
+
+    public Node getLeftChild(){
+        return arguments[leftChildIndex];
+    }
+
+    public Node getRightChild(){
+        return arguments[rightChildIndex];
     }
 
 }
