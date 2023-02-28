@@ -14,12 +14,14 @@ public class DataReader {
     private String filename;
     private LinkedHashSet<Map<String, Double>> dataSet;
     private final int batchSize = 100000;
+    private final GeneticProgram gp;
 
     /**
      * @param filename The location of the .csv file being read. Use absolute path from the Project Root
      */
-    public DataReader(String filename){
+    public DataReader(String filename, GeneticProgram gp){
         this.filename = filename;
+        this.gp = gp;
         dataSet = new LinkedHashSet<Map<String, Double>>();
     }
 
@@ -30,7 +32,7 @@ public class DataReader {
      * to the program/tree and store the results somewhere. This might cause some memory issues but you'll have to see. Could potentially
      * write the results to a file if you cannot store everything in memory. Also to save memory you can lower population size
      */
-    public void readData(GeneticProgram gp){
+    public void readData(){
         try(BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String[] keys = {
                 "Duration","Distance","PLong","PLatd","DLong","DLatd","Haversine","Pmonth","PDay",
@@ -78,7 +80,9 @@ public class DataReader {
 
             if(!dataSet.isEmpty()){//read whatever is left in the dataset 
                 //call a method to perform operations on the dataset
+                //Issue here is that the remaining data is not a multiple of 10. We have 77234 left. Find solution to this.
                 
+                //System.out.println(dataSet.size());
                 dataSet.clear();
                 dataSet = null;
                 System.gc();
@@ -90,6 +94,13 @@ public class DataReader {
             System.out.println( e.getMessage());
 
         }
+    }
+
+    /**
+     * @brief this is a method that will be used to process a batch of size batchSize
+     */
+    public void processBatch(){
+
     }
 
 }
