@@ -1,5 +1,7 @@
 package gp;
 
+import java.util.Map;
+
 /**
  * @brief This class acts an abstract parent to cater for the FunctionNode and TerminalNode classes.
  */
@@ -16,6 +18,7 @@ public abstract class Node {
      * @return Return value will be either value of terminal node or result of evaluating an function
      * @throws Exception
      */
-    public abstract double evaluate(double[] inputData) throws Exception;
+    // public abstract double evaluate(double[] inputData) throws Exception;
+    public abstract double evaluate(Map<Integer, Double> inputData) throws Exception;
     public abstract String getValue() throws Exception;
 }

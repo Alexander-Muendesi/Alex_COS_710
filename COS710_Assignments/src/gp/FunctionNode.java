@@ -1,5 +1,7 @@
 package gp;
 
+import java.util.Map;
+
 public class FunctionNode extends Node {
     private final int index;//basically we will have functions in a string array. This index identifies that function
     private Node[] arguments;//this will be the arguments of the function
@@ -27,7 +29,8 @@ public class FunctionNode extends Node {
      * @brief This function uses recursion to evaluate the operands of an operator and returns the result
      */
     @Override
-    public double evaluate(double[] input) throws Exception{//I dont think I need that input parameter for anything except for overriding issue
+    // public double evaluate(double[] input) throws Exception{//I dont think I need that input parameter for anything except for overriding issue
+    public double evaluate(Map<Integer, Double> input) throws Exception{//I dont think I need that input parameter for anything except for overriding issue
         double[] argumentVals = new double[numArguments];
 
         for(int i=0;i<numArguments;i++){
@@ -53,7 +56,7 @@ public class FunctionNode extends Node {
             case 0:
                 return args[0] + args[1];
             case 1:
-                return args[0] - args[0];
+                return args[0] - args[1];
             case 2:
                 return args[0] * args[1];
             case 3:
