@@ -7,14 +7,15 @@ import gp.TerminalNode;
 public class App {
     public static void main(String[] args) throws Exception {
         String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
-        double[] tempVals = {20.0,1.0,-2.0,1.22,2,3,44,5,6,7,5,44,3,2,45,6,6,73,2,6,3,7,8,55};
+        double[] tempVals = {20.0,1.5,-2.0,1.22,2.7,3.9,44,5,6,7,5,44,3,2,45,6,6,73,2,6,32,700.3,80.7,505.111};
 
         GeneticProgram gp = new GeneticProgram(100, 10, 24, 4, 244);
         gp.generatePopulation();
-        Node[] population = gp.getPopulation();
+        //Node[] population = gp.getPopulation();
 
-        gp.printIndividual(population[0]);
-        System.out.println("ansL: "+ population[0].evaluate(tempVals));
+        //int num =1;
+        //gp.printIndividual(population[num]);
+        //System.out.println("\nansL: "+ population[num].evaluate(tempVals));
 
         /*FunctionNode node = (FunctionNode)gp.generateIndividual();
         System.out.println("Individual: " + node.getValue() + " "+node.depth);
@@ -35,7 +36,7 @@ public class App {
             System.out.println("Left Child: " + t2.getValue() + " " + t2.depth);
         }*/
         DataReader reader = new DataReader(filename,gp);
-        //reader.readData();
+        reader.readData();
     }
 }
 

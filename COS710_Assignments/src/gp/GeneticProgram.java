@@ -4,6 +4,7 @@ import java.util.Queue;
 import java.util.Random;
 
 //NB: Assume root node is depth 1
+//Note. random.nextInt returns a number from 0 inclusive to upper bound exclusive
 public class GeneticProgram {
 
     private final int populationSize;
@@ -36,7 +37,8 @@ public class GeneticProgram {
      * @return The root node
      */
     public Node generateIndividual(){
-        int depth = 1 + random.nextInt(maxDepth);//could potentially change the 1 to 2 to avoid a tree which has one node,increase diversity
+        //saying 2 + because we don't want a single node tree which is just a terminal. Bad for diversity
+        int depth = 2 + random.nextInt(maxDepth);
         return grow(depth);
     }
 
