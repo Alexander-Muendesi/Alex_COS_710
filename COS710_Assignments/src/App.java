@@ -9,7 +9,8 @@ public class App {
         String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
         double[] tempVals = {20.0,1.5,-2.0,1.22,2.7,3.9,44,5,6,7,5,44,3,2,45,6,6,73,2,6,32,700.3,80.7,505.111};
 
-        GeneticProgram gp = new GeneticProgram(100, 10, 24, 4, 244);
+        //max default depth should be 6 from textbook
+        GeneticProgram gp = new GeneticProgram(100, 6, 24, 4, 244);
         gp.generatePopulation();
         //Node[] population = gp.getPopulation();
 
