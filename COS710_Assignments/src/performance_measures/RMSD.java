@@ -15,7 +15,7 @@ public class RMSD {
     }
 
     public void sumSqauredDifference(double acutalVal, double predictedVal){
-        numerator = Math.pow((acutalVal-predictedVal),exponent);
+        numerator += Math.pow((acutalVal-predictedVal),exponent);
         numItems = numItems + 1;
     }
 
