@@ -11,16 +11,27 @@ public class GeneticProgram {
     private final int maxDepth;
     private final int numTerminals;
     private final int numFunctions;
+    private final int tournamentSize;
     private final Random random;
     private Node[] population;//could possibly change this to linkedhashset for faster performance maybe?
 
-    public GeneticProgram(int populationSize,int maxDepth, int numTerminals, int numFunctions,int seed){
+    /**
+     * 
+     * @param populationSize
+     * @param maxDepth
+     * @param numTerminals
+     * @param numFunctions
+     * @param seed
+     * @param tournamentSize
+     */
+    public GeneticProgram(int populationSize,int maxDepth, int numTerminals, int numFunctions,int seed,int tournamentSize){
         this.populationSize = populationSize;
         this.maxDepth = maxDepth;
         this.numTerminals = numTerminals;
         this.numFunctions = numFunctions;
         random = new Random(seed);
         population = new Node[populationSize];
+        this.tournamentSize = tournamentSize;
     }
 
     public Node[] getPopulation(){
@@ -30,6 +41,10 @@ public class GeneticProgram {
 
     public int getPopulationSize(){
         return populationSize;
+    }
+
+    public int getTournamentSize(){
+        return this.tournamentSize;
     }
 
     /**

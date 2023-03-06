@@ -11,7 +11,7 @@ public class App {
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        GeneticProgram gp = new GeneticProgram(500, 6, 24, 4, 244);
+        GeneticProgram gp = new GeneticProgram(500, 6, 24, 4, 244,4);
         gp.generatePopulation();
         //Node[] population = gp.getPopulation();
 
