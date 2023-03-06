@@ -7,6 +7,7 @@ import java.util.Map;
 
 import java.util.Iterator;
 
+import gp.FunctionNode;
 import gp.GeneticProgram;
 import gp.Node;
 
@@ -112,6 +113,14 @@ public class DataReader {
             for(int i=0;i < population.length;i++){
                 Iterator<Map<Integer, Double>> it = batch.iterator();
                 //System.out.println("Predicted val: " + population[i].evaluate(it.next()));
+
+                //technically all elements of population should be FunctionNodes but could change during mutation, crossover
+                if(population[i] instanceof FunctionNode){
+                    FunctionNode temp = (FunctionNode) population[i];
+                    Map<Integer, Double> tempBatch = it.next();
+                    double predictedVal = temp.evaluate(tempBatch);
+                    temp.calcRawFitness(tempBatch.get(-1),predictedVal);//-1 is index for the bike duration trip
+                }
             }
         }
         catch(Exception e){

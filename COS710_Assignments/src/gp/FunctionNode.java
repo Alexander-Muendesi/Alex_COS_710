@@ -10,10 +10,13 @@ public class FunctionNode extends Node {
     private final int rightChildIndex = 1;
     public final int depth;//temporary maybe for printing purposes
 
+    private double rawFitness;//since root node will be function, root node will have a fitness value
+
     public FunctionNode(int index, int depth){
         this.index = index;
         this.depth = depth;
         arguments = new Node[numArguments];
+        rawFitness = 0;
     }
 
     /***
@@ -42,6 +45,10 @@ public class FunctionNode extends Node {
 
     public int getNumArguments(){
         return numArguments;
+    }
+
+    public double getRawFitness(){
+        return this.rawFitness;
     }
 
     /**
@@ -95,6 +102,15 @@ public class FunctionNode extends Node {
 
     public Node getRightChild(){
         return arguments[rightChildIndex];
+    }
+
+    /**
+     * @brief This function calculates the absolute value of the difference between predicted and actual value and adds it to raw fitness
+     * @param actualVal 
+     * @param predictedVal
+     */
+    public void calcRawFitness(double actualVal,double predictedVal){
+        rawFitness = rawFitness + Math.abs(predictedVal - actualVal);
     }
 
 }
