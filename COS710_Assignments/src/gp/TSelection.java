@@ -1,7 +1,5 @@
 package gp;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 //Tournament selection class
@@ -9,8 +7,6 @@ public class TSelection {
     private final int tournamentSize;
     private final Random random;
     private final Node[] participants;
-    private int index = 0;//used for accessing participants array when adding elements
-    private List<Integer> nonFreeParents;
 
     /**
      * 
@@ -21,7 +17,6 @@ public class TSelection {
         this.tournamentSize = tournamentSize;
         this.random = random;
         participants = new Node[tournamentSize];
-        nonFreeParents = new ArrayList<Integer>();
     }
 
     /**
@@ -33,14 +28,14 @@ public class TSelection {
 
         //randomly select the individuals for the tournament 
         for(int i=0;i<tournamentSize;i++){
-            int randomIndex = getRandomIndex(population.length);
+            int randomIndex = random.nextInt(population.length);
             participants[i] = population[randomIndex];
 
         }
 
         //get individual with best fitness
         for(int i=0;i<tournamentSize;i++){
-            if(i == 0){
+            if(i == 0){//a potential error could be if the population has a terminalNode tree somewhere, think of that
                 bestIndividual = (FunctionNode)participants[i];
             }
             else{
@@ -51,20 +46,5 @@ public class TSelection {
         }
 
         return (Node)bestIndividual;
-    }
-
-    public int getRandomIndex(int populationSize){
-        int randomIndex = random.nextInt(populationSize);
-
-        if(nonFreeParents.isEmpty() == false && nonFreeParents.contains(randomIndex) == false){
-            nonFreeParents.add(randomIndex);
-            return randomIndex;
-        }
-        else{
-            randomIndex = getRandomIndex(populationSize);
-            nonFreeParents.add(randomIndex);
-
-            return randomIndex;
-        }
     }
 }
