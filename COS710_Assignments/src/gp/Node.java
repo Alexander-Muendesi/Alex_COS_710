@@ -21,4 +21,14 @@ public abstract class Node {
     // public abstract double evaluate(double[] inputData) throws Exception;
     public abstract double evaluate(Map<Integer, Double> inputData) throws Exception;
     public abstract String getValue() throws Exception;
+    public abstract Node getParent();
+    public abstract Node getRoot();
+
+    /**
+     * @brief Given the root node, return all the nodes in the structure in an array. Does this in a
+     *          breadth first manner
+     * @param root
+     * @return Array of Nodes
+     */
+    public abstract Node[] getAllNodes(Node root);
 }

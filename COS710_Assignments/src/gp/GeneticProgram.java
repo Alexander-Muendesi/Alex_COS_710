@@ -54,24 +54,26 @@ public class GeneticProgram {
     public Node generateIndividual(){
         //saying 2 + because we don't want a single node tree which is just a terminal. Bad for diversity
         int depth = 2 + random.nextInt(maxDepth);
-        return grow(depth);
+        return grow(depth,null);//passing null as parent of root node
     }
 
     /**
      * @brief The if part randomly chooses when to create a terminal node. In this case if the sum of the number of functions and terminals
                 used a upper bound to random is less than the number of terminals generate a terminal node
      * @param depth How deep the tree is to grow
+     * @param parent Parent Node of current node
      * @return A node in the tree
      */
-    public Node grow(int depth){
+    public Node grow(int depth, Node parent){
         if(depth == 1 || random.nextInt(numFunctions+numTerminals) < numFunctions){
-            return new TerminalNode(random.nextInt(numTerminals),depth);
+            return new TerminalNode(random.nextInt(numTerminals),depth,parent);
         }
         else{
-            FunctionNode function = new FunctionNode(random.nextInt(numFunctions),depth);
+            FunctionNode function = new FunctionNode(random.nextInt(numFunctions),depth,parent);
+            parent = function;
 
             for(int i=0; i< function.getNumArguments();i++){
-                function.setArgument(i, grow(depth - 1));
+                function.setArgument(i, grow(depth - 1,parent));
             }
 
             return function;

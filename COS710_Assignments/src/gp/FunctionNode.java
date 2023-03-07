@@ -1,5 +1,7 @@
 package gp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class FunctionNode extends Node {
@@ -9,14 +11,20 @@ public class FunctionNode extends Node {
     private final int leftChildIndex = 0;
     private final int rightChildIndex = 1;
     public final int depth;//temporary maybe for printing purposes
+    private Node parent;
 
     private double rawFitness;//since root node will be function, root node will have a fitness value
 
-    public FunctionNode(int index, int depth){
+    public FunctionNode(int index, int depth, Node parent){
         this.index = index;
         this.depth = depth;
         arguments = new Node[numArguments];
         rawFitness = 0;
+        this.parent = parent;
+    }
+
+    public Node getParent(){
+        return this.parent;
     }
 
     /***
@@ -113,4 +121,36 @@ public class FunctionNode extends Node {
         rawFitness = rawFitness + Math.abs(predictedVal - actualVal);
     }
 
+    /**
+     * @brief Given any node return the root of its structure
+     */
+    public Node getRoot(){
+        Node current = this;
+
+        while(current.getParent() != null){
+            current = current.getParent();
+        }
+
+        return current;
+    }
+
+    public Node[] getAllNodes(Node root){
+        List<Node> nodes = new ArrayList<Node>();
+        nodes.add(root);
+
+        for(int i=0;i< nodes.size();i++){
+            Node curr = nodes.get(i);
+
+            if(curr instanceof FunctionNode){
+                FunctionNode fNode = (FunctionNode)curr;
+                nodes.add(fNode.getLeftChild());
+                nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
+            }
+            else if(i != 0 && curr instanceof TerminalNode){
+                nodes.add(curr);//add a terminal node
+            }
+        }
+
+        return nodes.toArray(new Node[nodes.size()]);
+    }
 }
