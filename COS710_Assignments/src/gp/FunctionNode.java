@@ -31,7 +31,7 @@ public class FunctionNode extends Node {
         this.rawFitness = rawFitness;
 
         for(int i=0;i < numArguments;i++)
-            this.arguments[i] = arguments[i];
+            this.arguments[i] = arguments[i].clone();
     }
 
     public Node clone(){
@@ -40,6 +40,10 @@ public class FunctionNode extends Node {
 
     public Node getParent(){
         return this.parent;
+    }
+
+    public void setParent(Node parent){
+        this.parent = parent;
     }
 
     /***
@@ -123,8 +127,16 @@ public class FunctionNode extends Node {
         return arguments[leftChildIndex];
     }
 
+    public void setLeftChild(Node input){
+        arguments[leftChildIndex] = input;
+    }
+
     public Node getRightChild(){
         return arguments[rightChildIndex];
+    }
+
+    public void setRightChild(Node input){
+        arguments[rightChildIndex] = input;
     }
 
     /**

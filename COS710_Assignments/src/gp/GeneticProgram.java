@@ -144,4 +144,70 @@ public class GeneticProgram {
         }
 
     }
+
+
+    public void subtreeCrossover(Node parentOne, Node parentTwo){
+        Node[] one = cloneNodes(parentOne.getAllNodes(parentOne.getRoot()));//wonder if I am not already passing the root to this method??
+        Node[] two = cloneNodes(parentTwo.getAllNodes(parentTwo.getRoot()));
+
+        //select a random node from each parent
+        int index1 = random.nextInt(one.length);
+        int index2 = random.nextInt(two.length);
+
+        Node node1 = one[index1];//crossover point root
+        Node node2 = two[index2];//crossover point root
+
+        //call the replace subtree method
+    }
+
+    /**
+     * @brief
+     * @param oldNode crossover point to be replaced
+     * @param newNode new crossover point to add
+     */
+    public void replaceSubtree(Node oldNode, Node replacementNode){
+        if(oldNode.getParent() == null){//replacing the root node
+            oldNode = replacementNode;
+        }
+        else{
+            Node parent = oldNode.getParent();
+            if(parent.getLeftChild() == oldNode){
+                if(replacementNode instanceof FunctionNode){
+                    FunctionNode fNode = (FunctionNode)replacementNode;
+                    parent.setLeftChild(fNode);
+                    fNode.setParent(parent);
+                }
+                else{
+                    TerminalNode tNode = (TerminalNode)replacementNode;
+                    parent.setLeftChild(tNode);
+                    tNode.setParent(parent);
+                }
+            }
+            else{
+                if(replacementNode instanceof FunctionNode){
+                    FunctionNode fNode = (FunctionNode)replacementNode;
+                    parent.setRightChild(fNode);
+                    fNode.setParent(parent);
+                }
+                else{
+                    TerminalNode tNode = (TerminalNode)replacementNode;
+                    parent.setRightChild(tNode);
+                    tNode.setParent(parent);
+                }
+            }
+        }
+    }
+
+    /**
+     * This method clones all the nodes returned from  getAllNodes method call.
+     * @param input
+     * @return
+     */
+    public Node[] cloneNodes(Node[] input){
+        Node[] result = new Node[input.length];
+        for(int i=0; i< result.length;i++)
+            result[i] = input[i].clone();
+            
+        return result;
+    }
 }

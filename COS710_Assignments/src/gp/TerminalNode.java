@@ -32,6 +32,10 @@ public class TerminalNode extends Node{
         return this.parent;
     }
 
+    public void setParent(Node parent){
+        this.parent = parent;
+    }
+
     // public double evaluate(double[] input){//might change this to a linkedhashset or something since data is in linkedHashSet.
     public double evaluate(Map<Integer, Double> input){//might change this to a linkedhashset or something since data is in linkedHashSet.
         // return input[index];
@@ -72,5 +76,20 @@ public class TerminalNode extends Node{
 
         return nodes.toArray(new Node[nodes.size()]);
     }
+
+    public Node getLeftChild(){
+        return null;
+    }
     
+    public Node getRightChild(){
+        return null;
+    }
+
+    public void setLeftChild(Node input){
+        return;//stub
+    }
+
+    public void setRightChild(Node input){
+        return;//stub
+    }
 }
