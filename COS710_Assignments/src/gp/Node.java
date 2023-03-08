@@ -23,6 +23,7 @@ public abstract class Node {
     public abstract String getValue() throws Exception;
     public abstract Node getParent();
     public abstract Node getRoot();
+    public abstract Node clone();
 
     /**
      * @brief Given the root node, return all the nodes in the structure in an array. Does this in a

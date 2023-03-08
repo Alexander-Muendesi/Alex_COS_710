@@ -8,13 +8,24 @@ public class TerminalNode extends Node{
 
     private final int index;//this will be the column number of data in the dataset in a specific row.
     public final int depth;//temporary for printing purposes for now
-    private Double terminalValue;
+    private double terminalValue;
     private Node parent;
 
     public TerminalNode(int index, int depth, Node parent){
         this.depth = depth;
         this.index = index;
         this.parent = parent;
+    }
+
+    public TerminalNode(int index, int depth, Node parent, double terminalValue){
+        this.index = index;
+        this.depth = depth;
+        this.parent = parent;
+        this.terminalValue = terminalValue;
+    }
+
+    public Node clone(){
+        return new TerminalNode(index, depth, parent, terminalValue);
     }
 
     public Node getParent(){

@@ -10,7 +10,7 @@ public class FunctionNode extends Node {
     private final int numArguments = 2;//for now we are dealing with the binary arithmetic operators
     private final int leftChildIndex = 0;
     private final int rightChildIndex = 1;
-    public final int depth;//temporary maybe for printing purposes
+    public int depth;//temporary maybe for printing purposes
     private Node parent;
 
     private double rawFitness;//since root node will be function, root node will have a fitness value
@@ -21,6 +21,21 @@ public class FunctionNode extends Node {
         arguments = new Node[numArguments];
         rawFitness = 0;
         this.parent = parent;
+    }
+
+    public FunctionNode(int index,Node[] arguments,int depth, Node parent, double rawFitness){
+        this.index = index;
+        this.depth = depth;
+        this.parent = parent;
+        this.arguments = new Node[numArguments];
+        this.rawFitness = rawFitness;
+
+        for(int i=0;i < numArguments;i++)
+            this.arguments[i] = arguments[i];
+    }
+
+    public Node clone(){
+        return new FunctionNode(index,arguments,depth,parent,rawFitness);
     }
 
     public Node getParent(){
