@@ -10,11 +10,30 @@ public class FunctionNode extends Node {
     private final int numArguments = 2;//for now we are dealing with the binary arithmetic operators
     private final int leftChildIndex = 0;
     private final int rightChildIndex = 1;
-    public int depth;//temporary maybe for printing purposes
+    private int depth;//temporary maybe for printing purposes
     private Node parent;
 
     private double rawFitness;//since root node will be function, root node will have a fitness value
 
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+
+        if(o instanceof FunctionNode == false)
+            return false;
+
+        FunctionNode tNode = (FunctionNode)o;
+
+        try {
+            return tNode.index == this.index && tNode.depth == this.depth && tNode.rawFitness == this.rawFitness
+                && parent.getValue() == tNode.parent.getValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } 
+    }
     public FunctionNode(int index, int depth, Node parent){
         this.index = index;
         this.depth = depth;
@@ -173,11 +192,20 @@ public class FunctionNode extends Node {
                 nodes.add(fNode.getLeftChild());
                 nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
             }
-            else if(i != 0 && curr instanceof TerminalNode){
-                nodes.add(curr);//add a terminal node
-            }
+            //else if(i != 0 && curr instanceof TerminalNode){
+            //    nodes.add(curr);//add a terminal node
+            //}
         }
 
         return nodes.toArray(new Node[nodes.size()]);
     }
+
+    public int getDepth(){
+        return this.depth;
+    }
+
+    public void setDepth(int depth){
+        this.depth = depth;
+    }
+
 }

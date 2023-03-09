@@ -99,12 +99,13 @@ public class DataReader {
         catch (Exception e) {
             System.out.print("Error Reading file in DataReader.java. \nError Message: ");
             System.out.println( e.getMessage());
+            e.printStackTrace();
 
         }
     }
 
     /**
-     * @brief this is a method that will be used to process a batch of size batchSize
+     * This is a method that will be used to process a batch of size batchSize
      */
     public void processBatch(LinkedHashSet<Map<Integer, Double>> batch){
         try{
@@ -120,6 +121,9 @@ public class DataReader {
                     Map<Integer, Double> tempBatch = it.next();
                     double predictedVal = temp.evaluate(tempBatch);
                     temp.calcRawFitness(tempBatch.get(-1),predictedVal);//-1 is index for the bike duration trip
+                }
+                else{
+                    System.out.println("Found a single terminal node in population. Decide what to do. (processBatch)");
                 }
             }
         }

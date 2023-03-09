@@ -31,7 +31,9 @@ public abstract class Node {
     
     public abstract void setLeftChild(Node input);
     public abstract void setRightChild(Node input);
+    public abstract int getDepth();
 
+    public abstract void setDepth(int depth);
     /**
      * @brief Given the root node, return all the nodes in the structure in an array. Does this in a
      *          breadth first manner

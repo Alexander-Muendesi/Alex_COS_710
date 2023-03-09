@@ -9,7 +9,7 @@ public class TSelection {
     private final Node[] participants;
 
     /**
-     * 
+     * Constructor which initializes the tournament size and the random number generator
      * @param tournamentSize
      * @param seed
      */
@@ -20,8 +20,9 @@ public class TSelection {
     }
 
     /**
-     * 
-     * @param population
+     * Method which performs the tournament selection
+     * @param population The population from which individuals are selected for tournament selection
+     * @return Node which wins the tournament
      */
     public Node calcTSelection(Node[] population){
         FunctionNode bestIndividual = null;

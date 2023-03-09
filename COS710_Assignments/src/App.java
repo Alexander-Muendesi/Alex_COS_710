@@ -1,44 +1,35 @@
+import java.io.File;
+import java.io.FileReader;
+import java.util.Scanner;
+
 import dataset_reading_classes.DataReader;
-import gp.FunctionNode;
 import gp.GeneticProgram;
 import gp.Node;
-import gp.TerminalNode;
+import gp.TSelection;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
-        double[] tempVals = {20.0,1.5,-2.0,1.22,2.7,3.9,44,5,6,7,5,44,3,2,45,6,6,73,2,6,32,700.3,80.7,505.111};
+        // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
+        String filename = "dataset.csv";
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        GeneticProgram gp = new GeneticProgram(500, 6, 24, 4, 244,4);
+        final int populationSize = 5;
+        final int maxDepth = 5;
+        final int numTerminals = 24;
+        final int numFunctions = 4;
+        final int seed = 4;
+        final int tournamentSize = 4;
+
+        GeneticProgram gp = new GeneticProgram(populationSize, maxDepth, numTerminals, numFunctions, seed,tournamentSize);
         gp.generatePopulation();
-        //Node[] population = gp.getPopulation();
-
-        //int num =1;
-        //gp.printIndividual(population[num]);
-        //System.out.println("\nansL: "+ population[num].evaluate(tempVals));
-
-        /*FunctionNode node = (FunctionNode)gp.generateIndividual();
-        System.out.println("Individual: " + node.getValue() + " "+node.depth);
-        System.out.println("Left child: " + node.getLeftChild().getValue());
-        System.out.println("Right child: " + node.getRightChild().getValue());
-
-        if(node.getRightChild() instanceof TerminalNode){
-            TerminalNode t1 = (TerminalNode)node.getRightChild();
-            System.out.println("Right Child1: " + t1.getValue() + " "+t1.depth);
-        }
-        else{
-            FunctionNode t11 = (FunctionNode)node.getRightChild();
-            System.out.println("Right Child11: " + t11.getValue() + " "+t11.depth);
-        }
-
-        if(node.getLeftChild() instanceof TerminalNode){
-            TerminalNode t2 = (TerminalNode)node.getLeftChild();
-            System.out.println("Left Child: " + t2.getValue() + " " + t2.depth);
-        }*/
+        
         DataReader reader = new DataReader(filename,gp);
         reader.readData();
+
+        TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
+        System.out.println("Calling gp execute");
+        gp.execute(tournament, reader);
     }
 }
 

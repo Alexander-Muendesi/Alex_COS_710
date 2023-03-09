@@ -7,9 +7,29 @@ import java.util.Map;
 public class TerminalNode extends Node{
 
     private final int index;//this will be the column number of data in the dataset in a specific row.
-    public final int depth;//temporary for printing purposes for now
+    private int depth;//temporary for printing purposes for now
     private double terminalValue;
     private Node parent;
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+
+        if(o instanceof TerminalNode == false)
+            return false;
+
+        TerminalNode fNode = (TerminalNode)o;
+
+        try {
+            return terminalValue == fNode.terminalValue && index == fNode.index && depth == fNode.depth
+                && parent.getValue() == fNode.parent.getValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public TerminalNode(int index, int depth, Node parent){
         this.depth = depth;
@@ -91,5 +111,13 @@ public class TerminalNode extends Node{
 
     public void setRightChild(Node input){
         return;//stub
+    }
+
+    public int getDepth(){
+        return this.depth;
+    }
+
+    public void setDepth(int depth){
+        this.depth = depth;
     }
 }
