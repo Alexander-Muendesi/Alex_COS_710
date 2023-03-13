@@ -14,6 +14,9 @@ public class TerminalNode extends Node{
 
     @Override
     public boolean equals(Object o){
+        if(o == null)
+            return false;
+        
         if(o == this){
             return true;
         }
@@ -23,13 +26,15 @@ public class TerminalNode extends Node{
 
         TerminalNode fNode = (TerminalNode)o;
 
-        try {
-            return terminalValue == fNode.terminalValue && index == fNode.index && depth == fNode.depth
-                && parent.getValue() == fNode.parent.getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        // try {
+        //     return terminalValue == fNode.terminalValue && index == fNode.index && depth == fNode.depth
+        //         && parent.getValue() == fNode.parent.getValue();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     return false;
+        // }
+
+        return this.id.equals(fNode.getID());
     }
 
     public TerminalNode(int index, int depth, Node parent, String id){

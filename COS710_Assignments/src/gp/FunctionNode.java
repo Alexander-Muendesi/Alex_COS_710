@@ -18,6 +18,9 @@ public class FunctionNode extends Node {
 
     @Override
     public boolean equals(Object o){
+        if(o == null)
+            return false;
+
         if(o == this){
             return true;
         }
@@ -27,13 +30,14 @@ public class FunctionNode extends Node {
 
         FunctionNode tNode = (FunctionNode)o;
 
-        try {
-            return tNode.index == this.index && tNode.depth == this.depth && tNode.rawFitness == this.rawFitness
-                && parent.getValue() == tNode.parent.getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } 
+        // try {
+        //     return tNode.index == this.index && tNode.depth == this.depth && tNode.rawFitness == this.rawFitness
+        //         && parent.getValue() == tNode.parent.getValue();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     return false;
+        // } 
+        return this.id.equals(tNode.getID());
     }
     public FunctionNode(int index, int depth, Node parent, String id){
         this.index = index;
