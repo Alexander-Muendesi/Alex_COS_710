@@ -10,6 +10,7 @@ public class TerminalNode extends Node{
     private int depth;//temporary for printing purposes for now
     private double terminalValue;
     private Node parent;
+    String id;
 
     @Override
     public boolean equals(Object o){
@@ -31,21 +32,23 @@ public class TerminalNode extends Node{
         }
     }
 
-    public TerminalNode(int index, int depth, Node parent){
+    public TerminalNode(int index, int depth, Node parent, String id){
         this.depth = depth;
         this.index = index;
         this.parent = parent;
+        this.id = id;
     }
 
-    public TerminalNode(int index, int depth, Node parent, double terminalValue){
+    public TerminalNode(int index, int depth, Node parent, double terminalValue, String id){
         this.index = index;
         this.depth = depth;
         this.parent = parent;
         this.terminalValue = terminalValue;
+        this.id = id;
     }
 
     public Node clone(){
-        return new TerminalNode(index, depth, parent, terminalValue);
+        return new TerminalNode(index, depth, parent, terminalValue,id);
     }
 
     public Node getParent(){
@@ -119,5 +122,13 @@ public class TerminalNode extends Node{
 
     public void setDepth(int depth){
         this.depth = depth;
+    }
+
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return this.id;
     }
 }

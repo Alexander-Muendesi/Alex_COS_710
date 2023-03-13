@@ -14,6 +14,7 @@ public class FunctionNode extends Node {
     private Node parent;
 
     private double rawFitness;//since root node will be function, root node will have a fitness value
+    private String id;
 
     @Override
     public boolean equals(Object o){
@@ -34,27 +35,29 @@ public class FunctionNode extends Node {
             return false;
         } 
     }
-    public FunctionNode(int index, int depth, Node parent){
+    public FunctionNode(int index, int depth, Node parent, String id){
         this.index = index;
         this.depth = depth;
         arguments = new Node[numArguments];
         rawFitness = 0;
         this.parent = parent;
+        this.id = id;
     }
 
-    public FunctionNode(int index,Node[] arguments,int depth, Node parent, double rawFitness){
+    public FunctionNode(int index,Node[] arguments,int depth, Node parent, double rawFitness, String id){
         this.index = index;
         this.depth = depth;
         this.parent = parent;
         this.arguments = new Node[numArguments];
         this.rawFitness = rawFitness;
+        this.id = id;
 
         for(int i=0;i < numArguments;i++)
             this.arguments[i] = arguments[i].clone();
     }
 
     public Node clone(){
-        return new FunctionNode(index,arguments,depth,parent,rawFitness);
+        return new FunctionNode(index,arguments,depth,parent,rawFitness,id);
     }
 
     public Node getParent(){
@@ -208,4 +211,11 @@ public class FunctionNode extends Node {
         this.depth = depth;
     }
 
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return this.id;
+    }
 }

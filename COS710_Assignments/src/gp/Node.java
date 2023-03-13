@@ -41,4 +41,6 @@ public abstract class Node {
      * @return Array of Nodes
      */
     public abstract Node[] getAllNodes(Node root);
+    public abstract String getID();//used to identify a node so that .equals can compare corectly
+    public abstract void setID(String id);
 }

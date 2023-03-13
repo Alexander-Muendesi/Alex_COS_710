@@ -2,6 +2,7 @@ package gp;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.UUID;//used to generate a unique ID for each node
 
 import dataset_reading_classes.DataReader;
 
@@ -76,10 +77,10 @@ public class GeneticProgram {
      */
     public Node grow(int depthLimit, Node parent, int depthCounter){
         if(depthCounter == depthLimit || random.nextInt(numFunctions+numTerminals) < numFunctions){
-            return new TerminalNode(random.nextInt(numTerminals),depthCounter,parent);
+            return new TerminalNode(random.nextInt(numTerminals),depthCounter,parent,UUID.randomUUID().toString());
         }
         else{
-            FunctionNode function = new FunctionNode(random.nextInt(numFunctions),depthCounter,parent);
+            FunctionNode function = new FunctionNode(random.nextInt(numFunctions),depthCounter,parent,UUID.randomUUID().toString());
             parent = function;
 
             for(int i=0; i< function.getNumArguments();i++){
