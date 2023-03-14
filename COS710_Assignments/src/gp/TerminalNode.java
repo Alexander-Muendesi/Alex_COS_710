@@ -97,9 +97,9 @@ public class TerminalNode extends Node{
                 nodes.add(fNode.getLeftChild());
                 nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
             }
-            else if(i != 0 && curr instanceof TerminalNode){
-                nodes.add(curr);//add a terminal node
-            }
+            // else if(i != 0 && curr instanceof TerminalNode){
+            //     nodes.add(curr);//add a terminal node
+            // }
         }
 
         return nodes.toArray(new Node[nodes.size()]);

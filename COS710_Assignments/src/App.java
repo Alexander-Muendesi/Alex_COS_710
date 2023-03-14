@@ -18,14 +18,14 @@ public class App {
         final int maxDepth = 5;
         final int numTerminals = 24;
         final int numFunctions = 4;
-        final int seed = 4;
+        final int seed = 808;
         final int tournamentSize = 4;
 
         GeneticProgram gp = new GeneticProgram(populationSize, maxDepth, numTerminals, numFunctions, seed,tournamentSize);
         gp.generatePopulation();
         
         DataReader reader = new DataReader(filename,gp);
-        reader.readData();
+        //reader.readData();
 
         TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
         System.out.println("Calling gp execute");

@@ -149,6 +149,10 @@ public class GeneticProgram {
     public Node[] subtreeCrossover(Node parentOne, Node parentTwo){
         Node[] one = cloneNodes(parentOne.getAllNodes(parentOne.getRoot()));//wonder if I am not already passing the root to this method??
         Node[] two = cloneNodes(parentTwo.getAllNodes(parentTwo.getRoot()));
+
+        Node[] onee = cloneNodes(parentOne.getAllNodes(parentOne.getRoot()));//wonder if I am not already passing the root to this method??
+        Node[] twoo = cloneNodes(parentTwo.getAllNodes(parentTwo.getRoot()));
+
         Node[] r = {parentOne,parentTwo};
 
         //select a random node from each parent
@@ -161,36 +165,66 @@ public class GeneticProgram {
         Node node1 = one[index1];//crossover point root
         Node node2 = two[index2];//crossover point root
 
+        Node node11 = onee[index1];
+        Node node22 = twoo[index2];
+
         //call the replace subtree method
         Node offSpringOne = replaceSubtree(node1, node2);
-        Node offSpringTwo = replaceSubtree(node2, node1);
+        Node offSpringTwo = replaceSubtree(node22, node11);
 
         //fix the depth values and see if maxDepth has been exceeded
         Boolean oneResult = fixDepth(offSpringOne, 0);
         Boolean twoResult = fixDepth(offSpringTwo, 0);
 
         if(oneResult && twoResult){//both offspring break max depth limit/ randomly return one of the parents
+
             Node[] temp = {r[random.nextInt(2)]}; 
             return temp;
         }
         else if(oneResult){//first offspring break depth limit. Return one of its parents and the second offspring
+
+            //update the id's of the new offspring to be different from parent
+            Node[] allNodes = offSpringTwo.getAllNodes(offSpringTwo.getRoot());
+            for(int i=0;i< allNodes.length;i++)
+                allNodes[i].setID(UUID.randomUUID().toString());
+
             Node[] temp = {offSpringTwo,r[random.nextInt(2)]};
             return temp;
         }
         else if(twoResult){//second offspring breaks depth limit. Return one of its parents and the first offspring
+
+
+            Node[] allNodes = offSpringOne.getAllNodes((offSpringOne.getRoot()));
+            for(int i=0;i<allNodes.length;i++)
+                allNodes[i].setID(UUID.randomUUID().toString());
+
             Node[] temp = {offSpringOne,r[random.nextInt(2)]};
             return temp;
         }
         else{//none of the offspring break depth limit. Return both offspring
+
+
+            Node []aNodes = offSpringOne.getAllNodes(offSpringOne.getRoot());
+            Node []bNodes = offSpringTwo.getAllNodes(offSpringTwo.getRoot());
+
+            for(int i=0;i<aNodes.length;i++)
+                aNodes[i].setID(UUID.randomUUID().toString());
+
+            for(int i=0;i<bNodes.length;i++)
+                bNodes[i].setID(UUID.randomUUID().toString());
+
             Node[] temp = {offSpringOne,offSpringTwo};
             return temp;
         }
     }
 
+
     /**
-     * Given two crossover node points this method gets the parent of each node and swaps it with other crossver point
+     * Given two crossover node points this method gets the parent of each node and swaps it with other crossver point. It
+     * then returns the whole complete tree not just the subtree
      * @param oldNode crossover point to be replaced
      * @param newNode new crossover point to add
+     * @return The root of the tree that was modified and contains the offspring
      */
     public Node replaceSubtree(Node oldNode, Node replacementNode){//thinking of sending root back 
         if(oldNode.getParent() == null){//replacing the root node
@@ -204,13 +238,13 @@ public class GeneticProgram {
                     FunctionNode fNode = (FunctionNode)replacementNode;
                     parent.setLeftChild(fNode);
                     fNode.setParent(parent);
-                    return oldNode.getParent();
+                    return parent.getRoot();
                 }
                 else{
                     TerminalNode tNode = (TerminalNode)replacementNode;
                     parent.setLeftChild(tNode);
                     tNode.setParent(parent);
-                    return oldNode.getParent();
+                    return parent.getRoot();
                 }
             }
             else if(parent.getRightChild().equals(oldNode)){
@@ -218,13 +252,13 @@ public class GeneticProgram {
                     FunctionNode fNode = (FunctionNode)replacementNode;
                     parent.setRightChild(fNode);
                     fNode.setParent(parent);
-                    return oldNode.getParent();
+                    return parent.getRoot();
                 }
                 else{
                     TerminalNode tNode = (TerminalNode)replacementNode;
                     parent.setRightChild(tNode);
                     tNode.setParent(parent);
-                    return oldNode.getParent();
+                    return parent.getRoot();
                 }
             }
             return null;
@@ -273,6 +307,30 @@ public class GeneticProgram {
     }
 
     /**
+     * This method performs the mutation operation on GP. It will randomly select a point
+     * then call the grow method. Currently limiting the max depth for the grow method to
+     * depth 2 with root being depth 0
+     * @param parent
+     * @return
+     */
+    public Node mutate(Node parent){
+        int mutationMaxDepth = 2;
+        Node[] nodes = parent.clone().getAllNodes(parent.getRoot());
+        int index = random.nextInt(nodes.length);
+        System.out.println("Index: " + index);
+
+        Node mutationPoint = nodes[index];
+
+        //Node replacementParent = new FunctionNode(random.nextInt(numFunctions),0,mutationPoint.getParent(),UUID.randomUUID().toString());
+        Node newSubtree = grow(mutationMaxDepth,mutationPoint.getParent(),0);
+
+        Node result = replaceSubtree(mutationPoint, newSubtree);
+        
+        Boolean oneResult = fixDepth(result, 0);
+        return (oneResult) ? parent : result;
+    }
+
+    /**
      * This method is the executor for the genetic program. It will run a while loop until stopping condition is met
      * @param tournament
      */
@@ -287,17 +345,18 @@ public class GeneticProgram {
             try {
                 //select individuals
                 Node parentOne = tournament.calcTSelection(population);
-                Node parentTwo = tournament.calcTSelection(population);
+                //Node parentTwo = tournament.calcTSelection(population);
 
                 printIndividual(parentOne);
-                printIndividual(parentTwo);
-                System.out.println("-----------------------");
+                //printIndividual(parentTwo);
+                System.out.println("\n-----------------------");
     
-                Node[] temp = subtreeCrossover(parentOne, parentTwo);
-                for(int i=0;i<temp.length;i++)
-                    printIndividual(temp[i]);
+                //Node[] temp = subtreeCrossover(parentOne, parentTwo);
+                //for(int i=0;i<temp.length;i++)
+                //    printIndividual(temp[i]);
     
                 counter--;
+                printIndividual(mutate(parentOne));
                 
             } catch (Exception e) {
                 System.out.println("Error in execute: " + e.getMessage());
