@@ -12,29 +12,36 @@ public class GeneticProgram {
 
     private final int populationSize;
     private final int maxDepth;
-    private final int numTerminals;
-    private final int numFunctions;
+    private final int numTerminals = 24;
+    private final int numFunctions = 4;
     private final int tournamentSize;
     private final Random random;
     private Node[] population;//could possibly change this to linkedhashset for faster performance maybe?
+    private final int numGenerations;
+    private final double mutationRate;
+    private final double crossoverRate;
+    private final int maxOffspringDepth;
 
     /**
      * Constructor which initializes various constants for the genetic progrma
      * @param populationSize
      * @param maxDepth
-     * @param numTerminals
-     * @param numFunctions
      * @param seed
      * @param tournamentSize
+     * @param numGenerations
      */
-    public GeneticProgram(int populationSize,int maxDepth, int numTerminals, int numFunctions,int seed,int tournamentSize){
+    public GeneticProgram(int populationSize,int maxDepth, int seed,int tournamentSize, int numGenerations,double mutationRate,
+            double crossoverRate, int maxOffspringDepth){
+
         this.populationSize = populationSize;
         this.maxDepth = maxDepth;
-        this.numTerminals = numTerminals;
-        this.numFunctions = numFunctions;
         random = new Random(seed);
         population = new Node[populationSize];
         this.tournamentSize = tournamentSize;
+        this.numGenerations = numGenerations;
+        this.mutationRate = mutationRate;
+        this.crossoverRate = crossoverRate;
+        this.maxOffspringDepth = maxOffspringDepth;
     }
 
     public Node[] getPopulation(){
@@ -158,9 +165,6 @@ public class GeneticProgram {
         //select a random node from each parent
         int index1 = random.nextInt(one.length);
         int index2 = random.nextInt(two.length);
-
-        System.out.println("Index 1: " + index1);
-        System.out.println("Index 2: " + index2);
 
         Node node1 = one[index1];//crossover point root
         Node node2 = two[index2];//crossover point root
@@ -314,7 +318,6 @@ public class GeneticProgram {
      * @return
      */
     public Node mutate(Node parent){
-        int mutationMaxDepth = 2;
         Node[] nodes = parent.clone().getAllNodes(parent.getRoot());
         int index = random.nextInt(nodes.length);
         System.out.println("Index: " + index);
@@ -322,7 +325,7 @@ public class GeneticProgram {
         Node mutationPoint = nodes[index];
 
         //Node replacementParent = new FunctionNode(random.nextInt(numFunctions),0,mutationPoint.getParent(),UUID.randomUUID().toString());
-        Node newSubtree = grow(mutationMaxDepth,mutationPoint.getParent(),0);
+        Node newSubtree = grow(maxOffspringDepth,mutationPoint.getParent(),0);
 
         Node result = replaceSubtree(mutationPoint, newSubtree);
         
@@ -336,12 +339,10 @@ public class GeneticProgram {
      */
     public void execute(TSelection tournament, DataReader reader){
         Node[] newPopulation = new Node[populationSize];//array to hold the new population size
-        int newPopulationCounter = 0;
-
-        int counter = 1;
+        int generationCounter = 0;
 
         //while termination condition is not met
-        while(counter > 0){//temporary condition. Replace later
+        while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
                 //select individuals
                 Node parentOne = tournament.calcTSelection(population);
@@ -355,7 +356,7 @@ public class GeneticProgram {
                 //for(int i=0;i<temp.length;i++)
                 //    printIndividual(temp[i]);
     
-                counter--;
+                generationCounter++;
                 printIndividual(mutate(parentOne));
                 
             } catch (Exception e) {

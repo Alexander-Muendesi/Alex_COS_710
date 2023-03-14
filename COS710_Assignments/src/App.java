@@ -1,10 +1,5 @@
-import java.io.File;
-import java.io.FileReader;
-import java.util.Scanner;
-
 import dataset_reading_classes.DataReader;
 import gp.GeneticProgram;
-import gp.Node;
 import gp.TSelection;
 
 public class App {
@@ -16,12 +11,15 @@ public class App {
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
         final int populationSize = 5;
         final int maxDepth = 5;
-        final int numTerminals = 24;
-        final int numFunctions = 4;
         final int seed = 808;
         final int tournamentSize = 4;
+        final int numGenerations = 5;
+        final double mutationRate = 0.5;
+        final double crossoverRate = 0.5;
+        final int maxOffspringDepth = 2;
 
-        GeneticProgram gp = new GeneticProgram(populationSize, maxDepth, numTerminals, numFunctions, seed,tournamentSize);
+        GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,seed,tournamentSize, numGenerations,mutationRate,crossoverRate,
+                                maxOffspringDepth);
         gp.generatePopulation();
         
         DataReader reader = new DataReader(filename,gp);
