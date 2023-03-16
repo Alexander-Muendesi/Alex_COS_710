@@ -29,14 +29,6 @@ public class FunctionNode extends Node {
             return false;
 
         FunctionNode tNode = (FunctionNode)o;
-
-        // try {
-        //     return tNode.index == this.index && tNode.depth == this.depth && tNode.rawFitness == this.rawFitness
-        //         && parent.getValue() == tNode.parent.getValue();
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     return false;
-        // } 
         return this.id.equals(tNode.getID());
     }
     public FunctionNode(int index, int depth, Node parent, String id){
@@ -48,28 +40,32 @@ public class FunctionNode extends Node {
         this.id = id;
     }
 
-    public FunctionNode(int index,Node[] arguments,int depth, Node parent, double rawFitness, String id){
+    public FunctionNode(int index,int depth, Node parent, double rawFitness, String id){
         this.index = index;
         this.depth = depth;
         this.parent = parent;
         this.arguments = new Node[numArguments];
-        this.rawFitness = rawFitness;
+        // this.rawFitness = rawFitness;
+        this.rawFitness = 0;
         this.id = id;
-
-        for(int i=0;i < numArguments;i++)
-            this.arguments[i] = arguments[i].clone();
     }
 
-    public Node clone(){
-        return new FunctionNode(index,arguments,depth,parent,rawFitness,id);
-    }
+    
 
     public Node getParent(){
         return this.parent;
     }
 
+    public Node[] getArguments(){
+        return this.arguments;
+    }
+
     public void setParent(Node parent){
         this.parent = parent;
+    }
+
+    public int getIndex(){
+        return this.index;
     }
 
     /***
@@ -199,9 +195,6 @@ public class FunctionNode extends Node {
                 nodes.add(fNode.getLeftChild());
                 nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
             }
-            //else if(i != 0 && curr instanceof TerminalNode){
-            //    nodes.add(curr);//add a terminal node
-            //}
         }
 
         return nodes.toArray(new Node[nodes.size()]);

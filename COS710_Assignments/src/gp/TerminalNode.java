@@ -10,7 +10,8 @@ public class TerminalNode extends Node{
     private int depth;//temporary for printing purposes for now
     private double terminalValue;
     private Node parent;
-    String id;
+    private double rawFitness;
+    private String id;
 
     @Override
     public boolean equals(Object o){
@@ -25,15 +26,6 @@ public class TerminalNode extends Node{
             return false;
 
         TerminalNode fNode = (TerminalNode)o;
-
-        // try {
-        //     return terminalValue == fNode.terminalValue && index == fNode.index && depth == fNode.depth
-        //         && parent.getValue() == fNode.parent.getValue();
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     return false;
-        // }
-
         return this.id.equals(fNode.getID());
     }
 
@@ -42,6 +34,7 @@ public class TerminalNode extends Node{
         this.index = index;
         this.parent = parent;
         this.id = id;
+        this.rawFitness = 0;
     }
 
     public TerminalNode(int index, int depth, Node parent, double terminalValue, String id){
@@ -50,10 +43,15 @@ public class TerminalNode extends Node{
         this.parent = parent;
         this.terminalValue = terminalValue;
         this.id = id;
+        this.rawFitness = 0;//think set it to 0 since we will be recalculating it in new population maybe??
     }
 
-    public Node clone(){
-        return new TerminalNode(index, depth, parent, terminalValue,id);
+    public TerminalNode(int index, int depth,double terminalValue, String id){
+        this.index = index;
+        this.depth = depth;
+        this.terminalValue = terminalValue;
+        this.id = id;
+        this.rawFitness = 0;//think set it to 0 since we will be recalculating it in new population maybe??
     }
 
     public Node getParent(){
@@ -62,6 +60,10 @@ public class TerminalNode extends Node{
 
     public void setParent(Node parent){
         this.parent = parent;
+    }
+
+    public Node[] getArguments(){
+        return null;
     }
 
     // public double evaluate(double[] input){//might change this to a linkedhashset or something since data is in linkedHashSet.
@@ -135,5 +137,17 @@ public class TerminalNode extends Node{
 
     public String getID(){
         return this.id;
+    }
+
+    public double getRawFitness(){
+        return this.rawFitness;
+    }
+
+    public int getIndex(){
+        return this.index;
+    }
+
+    public void calcRawFitness(double actualVal,double predictedVal){
+        rawFitness = rawFitness + Math.abs(predictedVal - actualVal);
     }
 }

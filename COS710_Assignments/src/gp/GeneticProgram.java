@@ -251,10 +251,24 @@ public class GeneticProgram {
             return null;
 
         if(root instanceof FunctionNode){
-            Node newNode = new FunctionNode(root.getIndex(), root.getArguments(), root.getDepth(), parent, root.getRawFitness(), 
+            Node newNode = new FunctionNode(root.getIndex(), root.getDepth(), parent, root.getRawFitness(), 
                             root.getID());
             newNode.setLeftChild(cloneTree(root.getLeftChild(),newNode));
             newNode.setRightChild(cloneTree(root.getRightChild(),newNode));
+
+            FunctionNode rtemp = (FunctionNode)root;
+            FunctionNode ntemp = (FunctionNode)newNode;
+
+            //make sure the arguments have references to the clone nodes not the orginal ones
+            for(int i=0;i<rtemp.getNumArguments();i++)
+            {
+                if(i==0)
+                    ntemp.setArgument(i,ntemp.getLeftChild());
+                else
+                    ntemp.setArgument(i,ntemp.getRightChild());
+            }
+
+            newNode = (Node)ntemp;
 
             return newNode;
         }

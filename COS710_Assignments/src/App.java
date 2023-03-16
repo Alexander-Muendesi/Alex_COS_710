@@ -1,5 +1,6 @@
 import dataset_reading_classes.DataReader;
 import gp.GeneticProgram;
+import gp.Node;
 import gp.TSelection;
 
 public class App {
@@ -11,23 +12,25 @@ public class App {
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
         final int populationSize = 5;
         final int maxDepth = 5;
-        final int seed = 808;
+        // final int seed = 808;//seed causing errors
+        // final int seed = 11;
+        final int seed = 18;
         final int tournamentSize = 4;
-        final int numGenerations = 5;
+        final int numGenerations = 2;
         final double mutationRate = 0.5;
         final double crossoverRate = 0.5;
         final int maxOffspringDepth = 2;
 
         GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,seed,tournamentSize, numGenerations,mutationRate,crossoverRate,
                                 maxOffspringDepth);
-        gp.generatePopulation();
+        //gp.generatePopulation();
         
         DataReader reader = new DataReader(filename,gp);
         //reader.readData();
 
         TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
-        System.out.println("Calling gp execute");
-        gp.execute(tournament, reader);
+        // System.out.println("Calling gp execute");
+        gp.executeTraining(tournament, reader);
     }
 }
 
