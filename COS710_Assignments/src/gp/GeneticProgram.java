@@ -1,5 +1,7 @@
 package gp;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.UUID;//used to generate a unique ID for each node
@@ -46,7 +48,6 @@ public class GeneticProgram {
 
     public Node[] getPopulation(){
         return this.population;
-        //Thought: this is the population that is getting evolved. With each generation read the next populationSize from training data
     }
 
     public int getPopulationSize(){
@@ -102,22 +103,14 @@ public class GeneticProgram {
      * This method creates a population of individuals/programs based on the populationSize parameter
      */
     public void generatePopulation(){
-        for(int i=0; i< populationSize;i++){
+        for(int i=0; i< populationSize;i++)
             population[i] = generateIndividual();
-            // try {
-            //     printIndividual(population[i]);
-            // } catch (Exception e) {
-            //     System.out.println(e.getMessage());
-            // }
-        }
     }
 
     /**
      * This method prints the individual program in a breadth first manner. Mainly for debugging purposes
      * @param root This is the root of the tree
-     * @throws Exception
-     * NB: Note that the depth is currently really messed up in the nodes. The maxdepth is basically the root(bloody useless).
-     * So this ended up affecting the inequality signs making them less than instead of bigger than. 
+     * @throws Exception 
      */
     public void printIndividual(Node root) throws Exception{
         if(root == null)
@@ -154,13 +147,19 @@ public class GeneticProgram {
      * @return Either one or two offspring
      */
     public Node[] subtreeCrossover(Node parentOne, Node parentTwo){
-        Node[] one = cloneNodes(parentOne.getAllNodes(parentOne.getRoot()));//wonder if I am not already passing the root to this method??
-        Node[] two = cloneNodes(parentTwo.getAllNodes(parentTwo.getRoot()));
+        Node first = cloneTree(parentOne.getRoot(),null);
+        Node[] one = first.getAllNodes(first.getRoot());
 
-        Node[] onee = cloneNodes(parentOne.getAllNodes(parentOne.getRoot()));//wonder if I am not already passing the root to this method??
-        Node[] twoo = cloneNodes(parentTwo.getAllNodes(parentTwo.getRoot()));
+        Node second = cloneTree(parentTwo.getRoot(),null);
+        Node[] two = second.getAllNodes(second.getRoot());
 
-        Node[] r = {parentOne,parentTwo};
+        Node firstt = cloneTree(parentOne.getRoot(),null);
+        Node[] onee = firstt.getAllNodes(firstt.getRoot());
+
+        Node secondd = cloneTree(parentTwo.getRoot(),null);
+        Node[] twoo = secondd.getAllNodes(secondd.getRoot());
+
+        Node[] r = {cloneTree(parentOne.getRoot(),null),cloneTree(parentTwo.getRoot(),null)};
 
         //select a random node from each parent
         int index1 = random.nextInt(one.length);
@@ -172,10 +171,58 @@ public class GeneticProgram {
         Node node11 = onee[index1];
         Node node22 = twoo[index2];
 
-        //call the replace subtree method
-        Node offSpringOne = replaceSubtree(node1, node2);
-        Node offSpringTwo = replaceSubtree(node22, node11);
+        Node offSpringOne = null;
+        Node offSpringTwo = null;
 
+        
+        //for offspring1
+        if(index1 == 0){//replacing root
+            //replace the root node1 with node2
+            node2.setParent(null);
+            offSpringOne = node2;
+        }
+        else{//replacing non root
+            Node parent = node1.getParent();   
+
+            if(parent.getLeftChild().equals(node1)){
+                parent.setLeftChild(node2);
+                node2.setParent(parent);
+                node1.setParent(null);
+                offSpringOne = parent.getRoot();
+            }
+            else if(parent.getRightChild().equals(node1)){
+                parent.setRightChild(node2);
+                node2.setParent(parent);
+                node1.setParent(null);
+                offSpringOne = parent.getRoot();
+            }
+            else{
+                System.out.println("error 200");
+            }
+        }
+        //for offspring 2
+        if(index2 == 0){//replacing root
+            node11.setParent(null);
+            offSpringTwo = node11;
+        }
+        else{
+            Node parent = node22.getParent();
+            if(parent.getLeftChild().equals(node22)){
+                parent.setLeftChild(node11);
+                node11.setParent(parent);
+                node22.setParent(null);
+                offSpringTwo = parent.getRoot();
+            }
+            else if(parent.getRightChild().equals(node22)){
+                parent.setRightChild(node11);
+                node11.setParent(parent);
+                node22.setParent(null);
+                offSpringTwo = parent.getRoot();
+            }
+            else{
+                System.out.println("error 223");
+            }
+        }
         //fix the depth values and see if maxDepth has been exceeded
         Boolean oneResult = fixDepth(offSpringOne, 0);
         Boolean twoResult = fixDepth(offSpringTwo, 0);
@@ -186,100 +233,38 @@ public class GeneticProgram {
             return temp;
         }
         else if(oneResult){//first offspring break depth limit. Return one of its parents and the second offspring
-
-            //update the id's of the new offspring to be different from parent
-            Node[] allNodes = offSpringTwo.getAllNodes(offSpringTwo.getRoot());
-            for(int i=0;i< allNodes.length;i++)
-                allNodes[i].setID(UUID.randomUUID().toString());
-
             Node[] temp = {offSpringTwo,r[random.nextInt(2)]};
             return temp;
         }
         else if(twoResult){//second offspring breaks depth limit. Return one of its parents and the first offspring
-
-
-            Node[] allNodes = offSpringOne.getAllNodes((offSpringOne.getRoot()));
-            for(int i=0;i<allNodes.length;i++)
-                allNodes[i].setID(UUID.randomUUID().toString());
-
             Node[] temp = {offSpringOne,r[random.nextInt(2)]};
             return temp;
         }
         else{//none of the offspring break depth limit. Return both offspring
-
-
-            Node []aNodes = offSpringOne.getAllNodes(offSpringOne.getRoot());
-            Node []bNodes = offSpringTwo.getAllNodes(offSpringTwo.getRoot());
-
-            for(int i=0;i<aNodes.length;i++)
-                aNodes[i].setID(UUID.randomUUID().toString());
-
-            for(int i=0;i<bNodes.length;i++)
-                bNodes[i].setID(UUID.randomUUID().toString());
-
             Node[] temp = {offSpringOne,offSpringTwo};
             return temp;
         }
     }
 
-
-    /**
-     * Given two crossover node points this method gets the parent of each node and swaps it with other crossver point. It
-     * then returns the whole complete tree not just the subtree
-     * @param oldNode crossover point to be replaced
-     * @param newNode new crossover point to add
-     * @return The root of the tree that was modified and contains the offspring
-     */
-    public Node replaceSubtree(Node oldNode, Node replacementNode){//thinking of sending root back 
-        if(oldNode.getParent() == null){//replacing the root node
-            oldNode = replacementNode;
-            return replacementNode;
-        }
-        else{
-            Node parent = oldNode.getParent();
-            if(parent.getLeftChild().equals(oldNode)){
-                if(replacementNode instanceof FunctionNode){
-                    FunctionNode fNode = (FunctionNode)replacementNode;
-                    parent.setLeftChild(fNode);
-                    fNode.setParent(parent);
-                    return parent.getRoot();
-                }
-                else{
-                    TerminalNode tNode = (TerminalNode)replacementNode;
-                    parent.setLeftChild(tNode);
-                    tNode.setParent(parent);
-                    return parent.getRoot();
-                }
-            }
-            else if(parent.getRightChild().equals(oldNode)){
-                if(replacementNode instanceof FunctionNode){
-                    FunctionNode fNode = (FunctionNode)replacementNode;
-                    parent.setRightChild(fNode);
-                    fNode.setParent(parent);
-                    return parent.getRoot();
-                }
-                else{
-                    TerminalNode tNode = (TerminalNode)replacementNode;
-                    parent.setRightChild(tNode);
-                    tNode.setParent(parent);
-                    return parent.getRoot();
-                }
-            }
+    public Node cloneTree(Node root, Node parent){
+        if(root == null)
             return null;
-        }
-    }
 
-    /**
-     * This method clones all the nodes returned from  getAllNodes method call.
-     * @param input
-     * @return
-     */
-    public Node[] cloneNodes(Node[] input){
-        Node[] result = new Node[input.length];
-        for(int i=0; i< result.length;i++)
-            result[i] = input[i].clone();
-            
-        return result;
+        if(root instanceof FunctionNode){
+            Node newNode = new FunctionNode(root.getIndex(), root.getArguments(), root.getDepth(), parent, root.getRawFitness(), 
+                            root.getID());
+            newNode.setLeftChild(cloneTree(root.getLeftChild(),newNode));
+            newNode.setRightChild(cloneTree(root.getRightChild(),newNode));
+
+            return newNode;
+        }
+        else{//assume instance of terminal Node
+            Node newNode = new TerminalNode(root.getIndex(), root.getDepth(), parent, root.getID());
+            newNode.setLeftChild(cloneTree(root.getLeftChild(), newNode));
+            newNode.setRightChild(cloneTree(root.getRightChild(), newNode));
+
+            return newNode;
+        }
     }
 
     /**
@@ -318,16 +303,36 @@ public class GeneticProgram {
      * @return
      */
     public Node mutate(Node parent){
-        Node[] nodes = parent.clone().getAllNodes(parent.getRoot());
-        int index = random.nextInt(nodes.length);
-        System.out.println("Index: " + index);
+        Node p1 = cloneTree(parent.getRoot(),null);
+        Node[] nodes = p1.getAllNodes(p1.getRoot());
 
+        int index = random.nextInt(nodes.length);
         Node mutationPoint = nodes[index];
 
-        //Node replacementParent = new FunctionNode(random.nextInt(numFunctions),0,mutationPoint.getParent(),UUID.randomUUID().toString());
         Node newSubtree = grow(maxOffspringDepth,mutationPoint.getParent(),0);
+        Node result = null;
 
-        Node result = replaceSubtree(mutationPoint, newSubtree);
+        if(mutationPoint.getParent() == null){//mutating the root
+            result = newSubtree;
+        }
+        else{//replacing node other than root
+            Node parentt = mutationPoint.getParent();
+            if(parentt.getLeftChild().equals(mutationPoint)){
+                parentt.setLeftChild(newSubtree);
+                newSubtree.setParent(parentt);
+                mutationPoint.setParent(null);
+                result = parentt.getRoot();
+            }
+            else if(parentt.getRightChild().equals(mutationPoint)){
+                parentt.setRightChild(mutationPoint);
+                newSubtree.setParent(parentt);
+                mutationPoint.setParent(null);
+                result = parentt.getRoot();
+            }
+            else{
+                System.out.println("Error 333");
+            }
+        }
         
         Boolean oneResult = fixDepth(result, 0);
         return (oneResult) ? parent : result;
@@ -337,32 +342,107 @@ public class GeneticProgram {
      * This method is the executor for the genetic program. It will run a while loop until stopping condition is met
      * @param tournament
      */
-    public void execute(TSelection tournament, DataReader reader){
-        Node[] newPopulation = new Node[populationSize];//array to hold the new population size
+    public void executeTraining(TSelection tournament, DataReader reader){
         int generationCounter = 0;
+        int crossEnd = (int) (populationSize * crossoverRate);
+
+        int mutationStart = crossEnd+1;
+
+        //initialize the population
+        generatePopulation();
 
         //while termination condition is not met
         while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
-                //select individuals
-                Node parentOne = tournament.calcTSelection(population);
-                //Node parentTwo = tournament.calcTSelection(population);
 
-                printIndividual(parentOne);
-                //printIndividual(parentTwo);
-                System.out.println("\n-----------------------");
-    
-                //Node[] temp = subtreeCrossover(parentOne, parentTwo);
-                //for(int i=0;i<temp.length;i++)
-                //    printIndividual(temp[i]);
-    
+                //evaluate the population
+                reader.trainData();
+                printIndividual(getBestIndividual());
+
+                //select parents for next generation and apply genetic operators
+                List<Node> nodes = performCrossover(crossEnd, tournament);
+                if(nodes.contains(null)){
+                    System.out.println("null is from crossvoer");
+                }
+                population = performMutation(mutationStart, tournament, nodes);
                 generationCounter++;
-                printIndividual(mutate(parentOne));
+
+                nodes = null;
+                System.gc();//clear whatever memory was being used
                 
             } catch (Exception e) {
                 System.out.println("Error in execute: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * This method calls subtree crossover to generate crossover rate * population size number of individuals
+     * @param crossEnd number of offspring to create from crossover
+     * @param tournament 
+     * @return the new population populated with offspring created from subtree crossover
+     */
+    public List<Node> performCrossover(int crossEnd, TSelection tournament){
+        List<Node> nodes = new ArrayList<Node>();
+        int counter = 0;
+
+        while(counter <= crossEnd){
+            //select parents for crossover
+            Node parentOne = tournament.calcTSelection(population);
+            Node parentTwo = tournament.calcTSelection(population);
+
+            Node[] offSpring = subtreeCrossover(parentOne, parentTwo);
+            if(offSpring.length == 1){
+                nodes.add(offSpring[0]);
+                counter++;
+            }
+            else if(offSpring.length == 2){
+                nodes.add(offSpring[0]);
+                counter++;
+
+                if(counter >crossEnd)
+                    break;
+                nodes.add(offSpring[1]);
+                counter++;
+            }
+            System.gc();
+        }
+        return nodes;
+    }
+
+    /**
+     * This method selects parents for mutation and does mutation. It adds onto the parents from crossover
+     * @param mutationStart just an index for where to start counting the mutation offspring
+     * @param tournament Used to carry out tournament selection
+     * @param nodes the structure which already parents from crossover
+     * @return An array of the complete new population
+     */
+    public Node[] performMutation(int mutationStart,TSelection tournament,List<Node> nodes){
+        for(int i=mutationStart;i<populationSize;i++){
+            Node parentOne = tournament.calcTSelection(population);
+            nodes.add(mutate(parentOne));
+        }
+        if(nodes.contains(null))
+            System.out.println("null if from mutation");
+        return nodes.toArray(new Node[nodes.size()]);
+    }
+
+    /**
+     * This method returns the fittest individual in the generation
+     * @return Node representing fittest individual
+     */
+    public Node getBestIndividual(){
+        double fitness = Double.MAX_VALUE;
+        int index = 0;
+
+        for(int i=0;i< populationSize;i++)
+            if(population[i].getRawFitness() < fitness){
+                fitness = population[i].getRawFitness();
+                index = i;
+            }
+
+        System.out.println("Fitness:"+population[index].getRawFitness());
+        return population[index];
     }
 }
