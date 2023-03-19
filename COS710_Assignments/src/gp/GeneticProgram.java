@@ -118,7 +118,6 @@ public class GeneticProgram {
         Queue<Node> queue = new LinkedList<Node>();
         queue.add(root);
         int currentDepth = root.getDepth();
-        System.out.println("\n");
 
         while(queue.isEmpty() == false){
             Node node = queue.remove();
@@ -136,6 +135,7 @@ public class GeneticProgram {
                 queue.add(functionNode.getRightChild());
             }
         }
+        System.out.println();
     }
 
     /**
@@ -368,10 +368,13 @@ public class GeneticProgram {
         //while termination condition is not met
         while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
+                System.out.println("Generation: " + generationCounter);
 
                 //evaluate the population
                 reader.trainData();
-                printIndividual(getBestIndividual());
+                // printIndividual(getBestIndividual());
+                Node best = getBestIndividual();
+                System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
 
                 //select parents for next generation and apply genetic operators
                 List<Node> nodes = performCrossover(crossEnd, tournament);
@@ -383,6 +386,8 @@ public class GeneticProgram {
 
                 nodes = null;
                 System.gc();//clear whatever memory was being used
+                System.out.println("---------------------------------------------------");
+                System.out.println();
                 
             } catch (Exception e) {
                 System.out.println("Error in execute: " + e.getMessage());
@@ -456,7 +461,7 @@ public class GeneticProgram {
                 index = i;
             }
 
-        System.out.println("Fitness:"+population[index].getRawFitness());
+        System.out.println("Fitness: "+population[index].getRawFitness());
         return population[index];
     }
 }

@@ -10,27 +10,32 @@ public class App {
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        final int populationSize = 5;
-        final int maxDepth = 5;
+        final int populationSize = 100;
+        final int maxDepth = 17;
         // final int seed = 808;//seed causing errors
         // final int seed = 11;
-        final int seed = 18;
+        int seed = 18;
         final int tournamentSize = 4;
-        final int numGenerations = 2;
-        final double mutationRate = 0.5;
-        final double crossoverRate = 0.5;
+        final int numGenerations = 50;
+        final double mutationRate = 0.60;
+        final double crossoverRate = 0.40;
         final int maxOffspringDepth = 2;
 
-        GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,seed,tournamentSize, numGenerations,mutationRate,crossoverRate,
-                                maxOffspringDepth);
-        //gp.generatePopulation();
-        
-        DataReader reader = new DataReader(filename,gp);
-        //reader.readData();
+        for(seed=0; seed<= 50000;seed++){
+            System.out.println("Seed: "+ seed);
+            GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,seed,tournamentSize, numGenerations,mutationRate,crossoverRate,
+                                    maxOffspringDepth);
+            //gp.generatePopulation();
+            
+            DataReader reader = new DataReader(filename,gp);
+            //reader.readData();
+    
+            TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
+            // System.out.println("Calling gp execute");
+            gp.executeTraining(tournament, reader);
+            System.out.println("******************************************************");
+        }
 
-        TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
-        // System.out.println("Calling gp execute");
-        gp.executeTraining(tournament, reader);
     }
 }
 

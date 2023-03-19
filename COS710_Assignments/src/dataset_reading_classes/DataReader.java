@@ -11,7 +11,7 @@ import gp.Node;
 public class DataReader {
     private String filename;
     private LinkedHashSet<Map<Integer, Double>> dataSet;
-    private final int batchSize = 100000;
+    private final int batchSize = 1000000;
     private final GeneticProgram gp;
     private final int trainingLimit = 6700000;//first 6.7 million lines will be training data
 
@@ -38,6 +38,7 @@ public class DataReader {
                 "Phour","Pmin","PDWeek","Dmonth","Dday","Dhour","Dmin","DDweek","Temp",
                 "Precip","Wind","Humid","Solar","Snow","GroundTemp","Dust"
             };*/
+            dataSet = new LinkedHashSet<Map<Integer, Double>>();
             //-1 will be for duration then 0 for distance, 1 for PLong etc
             int[] keys = {-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
             String line= "";
@@ -48,8 +49,14 @@ public class DataReader {
             //total number of lines = 9601139.0
             //total lines read in map = 9577234.0;
             while((line = reader.readLine()) != null){
-                if(numLines == trainingLimit)
+                if(numLines == trainingLimit){
+                    processBatch(dataSet);
+                    dataSet.clear();//remove all references from the data structure
+                    dataSet = null;
+                    dataSet = new LinkedHashSet<Map<Integer, Double>>();
+                    System.gc();//Force Garbage collector to run
                     break;
+                }
                 int startIndex = 0;
                 int endIndex = line.indexOf(',');
                 int keyCounter = 0;
@@ -77,13 +84,14 @@ public class DataReader {
                 if(dataSet.size() == batchSize){
                     //call a method of some class to do some work on the current batch of 10 before moving to another batch
                     processBatch(dataSet);
-                    numLines += dataSet.size();
+                    // numLines += dataSet.size();
 
                     dataSet.clear();//remove all references from the data structure
                     dataSet = null;
                     dataSet = new LinkedHashSet<Map<Integer, Double>>();
                     System.gc();//Force Garbage collector to run
                 }
+                numLines++;
             }
 
             if(!dataSet.isEmpty()){//read whatever is left in the dataset 
@@ -96,10 +104,7 @@ public class DataReader {
                 dataSet.clear();
                 dataSet = null;
                 System.gc();
-                System.out.println("hellow");
             }
-            System.out.println("Num Lines: " + numLines);
-
         }
         catch (Exception e) {
             System.out.print("Error Reading file in DataReader.java. \nError Message: ");
