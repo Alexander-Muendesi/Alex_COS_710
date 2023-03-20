@@ -288,14 +288,13 @@ public class GeneticProgram {
      * @return True means me have exceeded max depth. False means we have not exceeded max depth
      */
     public boolean fixDepth(Node root, int depth){
+        if(depth > maxDepth)
+                return true;
+        
         if(root != null){
             root.setDepth(depth);
             fixDepth(root.getLeftChild(), depth+1);
             fixDepth(root.getRightChild(),depth+1);
-    
-            if(depth > maxDepth)
-                return true;
-    
             return false;
         }
         return false;
@@ -349,7 +348,7 @@ public class GeneticProgram {
         }
         
         Boolean oneResult = fixDepth(result, 0);
-        return (oneResult) ? parent : result;
+        return (oneResult) ? (cloneTree(parent.getRoot(), null)) : result;
     }
 
     /**
@@ -375,6 +374,8 @@ public class GeneticProgram {
                 // printIndividual(getBestIndividual());
                 Node best = getBestIndividual();
                 System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
+                System.out.println("Best Depth: " + best.getDepth());
+                printIndividual(best);
 
                 //select parents for next generation and apply genetic operators
                 List<Node> nodes = performCrossover(crossEnd, tournament);
@@ -385,15 +386,23 @@ public class GeneticProgram {
                 generationCounter++;
 
                 nodes = null;
-                System.gc();//clear whatever memory was being used
-                System.out.println("---------------------------------------------------");
+                System.out.println("____________________________________________________________________________");
                 System.out.println();
+                System.gc();//clear whatever memory was being used
                 
+
             } catch (Exception e) {
                 System.out.println("Error in execute: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+        //Node best = getBestIndividual();
+        //System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
+        //try {
+        //    printIndividual(best.getRoot());
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
     }
 
     /**
