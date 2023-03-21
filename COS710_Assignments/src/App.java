@@ -1,3 +1,5 @@
+import java.util.Random;
+
 import dataset_reading_classes.DataReader;
 import gp.GeneticProgram;
 import gp.Node;
@@ -10,16 +12,19 @@ public class App {
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        final int populationSize = 100;
+        final int populationSize = 500;
         final int maxDepth = 17;
         // final int seed = 808;//seed causing errors
         // final int seed = 11;
-        int seed = 18;
+        int seed = 1800;
         final int tournamentSize = 4;
-        final int numGenerations = 50;
+        final int numGenerations = 60;//was 50
         final double mutationRate = 0.60;
         final double crossoverRate = 0.40;
         final int maxOffspringDepth = 2;
+
+
+        
 
         for(seed=0; seed<= 50000;seed++){
             System.out.println("Seed: "+ seed);

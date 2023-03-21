@@ -9,7 +9,6 @@ import java.util.UUID;//used to generate a unique ID for each node
 import dataset_reading_classes.DataReader;
 
 //NB: Assume root node is depth 0
-//Note. random.nextInt returns a number from 0 inclusive to upper bound exclusive
 public class GeneticProgram {
 
     private final int populationSize;
@@ -18,7 +17,7 @@ public class GeneticProgram {
     private final int numFunctions = 4;
     private final int tournamentSize;
     private final Random random;
-    private Node[] population;//could possibly change this to linkedhashset for faster performance maybe?
+    private Node[] population;
     private final int numGenerations;
     private final double mutationRate;
     private final double crossoverRate;
