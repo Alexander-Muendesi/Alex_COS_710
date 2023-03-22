@@ -8,19 +8,21 @@ import gp.TSelection;
 public class App {
     public static void main(String[] args) throws Exception {
         // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
-        String filename = "dataset.csv";
+        // String filename = "COS710_Assignments/src/dataset_reading_classes/data.csv";
+        String filename = "data.csv";
+
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        final int populationSize = 500;
-        final int maxDepth = 17;
+        final int populationSize = 100;
+        final int maxDepth = 10;
         // final int seed = 808;//seed causing errors
         // final int seed = 11;
         int seed = 1800;
         final int tournamentSize = 4;
-        final int numGenerations = 60;//was 50
-        final double mutationRate = 0.60;
-        final double crossoverRate = 0.40;
+        final int numGenerations = 50;//was 50
+        final double mutationRate = 0.50;
+        final double crossoverRate = 0.50;
         final int maxOffspringDepth = 2;
 
 

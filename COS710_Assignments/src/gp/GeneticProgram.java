@@ -7,6 +7,10 @@ import java.util.Random;
 import java.util.UUID;//used to generate a unique ID for each node
 
 import dataset_reading_classes.DataReader;
+import performance_measures.MAE;
+import performance_measures.MedianAbsoluteDev;
+import performance_measures.RMSD;
+import performance_measures.RSquared;
 
 //NB: Assume root node is depth 0
 public class GeneticProgram {
@@ -22,6 +26,10 @@ public class GeneticProgram {
     private final double mutationRate;
     private final double crossoverRate;
     private final int maxOffspringDepth;
+    public MAE meanAbsoluteError;
+    public MedianAbsoluteDev meanAbsolDev;
+    public RMSD rmsd;
+    public RSquared rSquared;
 
     /**
      * Constructor which initializes various constants for the genetic progrma
@@ -229,14 +237,17 @@ public class GeneticProgram {
         if(oneResult && twoResult){//both offspring break max depth limit/ randomly return one of the parents
 
             Node[] temp = {r[random.nextInt(2)]}; 
+            fixDepth(temp[0].getRoot(), 0);//just call it to make the clone have different ID's
             return temp;
         }
         else if(oneResult){//first offspring break depth limit. Return one of its parents and the second offspring
             Node[] temp = {offSpringTwo,r[random.nextInt(2)]};
+            fixDepth(temp[1].getRoot(), 0);//just call it to make the clone have different ID's
             return temp;
         }
         else if(twoResult){//second offspring breaks depth limit. Return one of its parents and the first offspring
             Node[] temp = {offSpringOne,r[random.nextInt(2)]};
+            fixDepth(temp[1].getRoot(), 0);//just call it to make the clone have different ID's
             return temp;
         }
         else{//none of the offspring break depth limit. Return both offspring
@@ -287,16 +298,29 @@ public class GeneticProgram {
      * @return True means me have exceeded max depth. False means we have not exceeded max depth
      */
     public boolean fixDepth(Node root, int depth){
-        if(depth > maxDepth)
-                return true;
+        // if(depth > maxDepth){
+        //     return true;
+        // }
         
-        if(root != null){
-            root.setDepth(depth);
-            fixDepth(root.getLeftChild(), depth+1);
-            fixDepth(root.getRightChild(),depth+1);
+        // if(root != null){
+        //     root.setDepth(depth);
+        //     root.setID(UUID.randomUUID().toString());//make the id's of the clones unique after processing
+        //     fixDepth(root.getLeftChild(), depth+1);
+        //     fixDepth(root.getRightChild(),depth+1);
+        //     return false;
+        // }
+        // return false;
+
+        if(root == null)
             return false;
+        else if(depth > maxDepth)
+            return true;
+        else{
+            root.setDepth(depth);
+            boolean left = fixDepth(root.getLeftChild(), depth+1);
+            boolean right = fixDepth(root.getRightChild(),depth+1);
+            return left && right;
         }
-        return false;
     }
 
     /**
@@ -336,7 +360,7 @@ public class GeneticProgram {
                 result = parentt.getRoot();
             }
             else if(parentt.getRightChild().equals(mutationPoint)){
-                parentt.setRightChild(mutationPoint);
+                parentt.setRightChild(newSubtree);
                 newSubtree.setParent(parentt);
                 mutationPoint.setParent(null);
                 result = parentt.getRoot();
@@ -347,7 +371,9 @@ public class GeneticProgram {
         }
         
         Boolean oneResult = fixDepth(result, 0);
-        return (oneResult) ? (cloneTree(parent.getRoot(), null)) : result;
+        Node par = cloneTree(parent.getRoot(), null);
+        fixDepth(par.getRoot(), 0);//make the id's of parent clone unique
+        return (oneResult) ? (par) : result;
     }
 
     /**
@@ -355,6 +381,9 @@ public class GeneticProgram {
      * @param tournament
      */
     public void executeTraining(TSelection tournament, DataReader reader){
+        double average = reader.getDatasetAverage();
+        // System.out.println("average: " + average);
+
         int generationCounter = 0;
         int crossEnd = (int) (populationSize * crossoverRate);
 
@@ -362,7 +391,7 @@ public class GeneticProgram {
 
         //initialize the population
         generatePopulation();
-
+        Node best = null;
         //while termination condition is not met
         while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
@@ -371,7 +400,7 @@ public class GeneticProgram {
                 //evaluate the population
                 reader.trainData();
                 // printIndividual(getBestIndividual());
-                Node best = getBestIndividual();
+                best = getBestIndividual();
                 System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
                 System.out.println("Best Depth: " + best.getDepth());
                 printIndividual(best);
@@ -395,6 +424,11 @@ public class GeneticProgram {
                 e.printStackTrace();
             }
         }
+        meanAbsoluteError = new MAE();
+        meanAbsolDev = new MedianAbsoluteDev(average);
+        rSquared = new RSquared();
+        rmsd = new RMSD();
+        executeTest(best,meanAbsoluteError,meanAbsolDev,rSquared,rmsd,reader);
         //Node best = getBestIndividual();
         //System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
         //try {
@@ -402,6 +436,16 @@ public class GeneticProgram {
         //} catch (Exception e) {
         //    e.printStackTrace();
         //}
+    }
+
+    public void executeTest(Node best, MAE mae,MedianAbsoluteDev mad, RSquared rSquared, RMSD rmsd, DataReader reader){
+        reader.testData(best,mae,mad,rSquared,rmsd);
+
+        System.out.println("\nPerformance metrics for test data set");
+        System.out.println("Mean Absolute Error: " + mae.getMae());
+        System.out.println("Mean Absolute Deviation: " + mad.getMedianValue());
+        System.out.println("RSquared: " + rSquared.calcRSquared());
+        System.out.println("RMDS: " + rmsd.calcFinalResult());
     }
 
     /**
@@ -472,4 +516,6 @@ public class GeneticProgram {
         System.out.println("Fitness: "+population[index].getRawFitness());
         return population[index];
     }
+
+
 }
