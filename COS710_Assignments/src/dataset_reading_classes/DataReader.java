@@ -22,7 +22,8 @@ public class DataReader {
     private LinkedHashSet<Map<Integer, Double>> dataSet;
     private final int batchSize = 1500000;
     private final GeneticProgram gp;
-    private final int trainingLimit = 700000;//first 6.7 million lines will be training data
+    // private final int trainingLimit = 700000;//first 6.7 million lines will be training data
+    private final int trainingLimit = 105000;//first 6.7 million lines will be training data
 
     private int numItems = 0;//used to keep track of the number of items in the dataset
 
@@ -169,16 +170,19 @@ public class DataReader {
 
             String line = "";
             double result = 0;
+            int counter = 0;
             while((line = reader.readLine()) != null){
-                //skip the first column which is just a counter
-                int startIndex = 0;
-                int endIndex = line.indexOf(",");
-                startIndex = endIndex + 1;
-                endIndex = line.indexOf(",", startIndex);
-
-                // System.out.println(line.substring(startIndex,endIndex));
-                result += Double.valueOf(line.substring(startIndex,endIndex));
-                numItems++;
+                if(counter++ > trainingLimit){
+                    //skip the first column which is just a counter
+                    int startIndex = 0;
+                    int endIndex = line.indexOf(",");
+                    startIndex = endIndex + 1;
+                    endIndex = line.indexOf(",", startIndex);
+    
+                    // System.out.println(line.substring(startIndex,endIndex));
+                    result += Double.valueOf(line.substring(startIndex,endIndex));
+                    numItems++;
+                }
             }
             reader.close();
             return result / numItems;
@@ -255,7 +259,7 @@ public class DataReader {
                 mae.calcDiff(val.get(-1), predictedVal);
                 mad.calcAbsValue(val.get(-1), predictedVal);
                 rSquared.calcRss(val.get(-1), predictedVal);
-                rSquared.calcTss(val.get(-1), predictedVal);
+                rSquared.calcTss(val.get(-1));
                 rmsd.sumSqauredDifference(val.get(-1), predictedVal);
 
                 best.calcRawFitness(val.get(-1), predictedVal);

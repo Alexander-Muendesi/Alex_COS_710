@@ -96,10 +96,9 @@ public class GeneticProgram {
         }
         else{
             FunctionNode function = new FunctionNode(random.nextInt(numFunctions),depthCounter,parent,UUID.randomUUID().toString());
-            parent = function;
 
             for(int i=0; i< function.getNumArguments();i++){
-                function.setArgument(i, grow(depthLimit,parent,depthCounter+1));
+                function.setArgument(i, grow(depthLimit,function,depthCounter+1));
             }
 
             return function;
@@ -128,7 +127,6 @@ public class GeneticProgram {
 
         while(queue.isEmpty() == false){
             Node node = queue.remove();
-            
 
             if(node.getDepth() > currentDepth || node.getDepth() == root.getDepth()){
                 System.out.println();
@@ -257,10 +255,10 @@ public class GeneticProgram {
     }
 
     public Node cloneTree(Node root, Node parent){
-        if(root == null)
+        if(root == null){
             return null;
-
-        if(root instanceof FunctionNode){
+        }
+        else if(root instanceof FunctionNode){
             Node newNode = new FunctionNode(root.getIndex(), root.getDepth(), parent, root.getRawFitness(), 
                             root.getID());
             newNode.setLeftChild(cloneTree(root.getLeftChild(),newNode));
@@ -282,12 +280,16 @@ public class GeneticProgram {
 
             return newNode;
         }
-        else{//assume instance of terminal Node
+        else if(root instanceof TerminalNode){//assume instance of terminal Node
             Node newNode = new TerminalNode(root.getIndex(), root.getDepth(), parent, root.getID());
             newNode.setLeftChild(cloneTree(root.getLeftChild(), newNode));
             newNode.setRightChild(cloneTree(root.getRightChild(), newNode));
 
             return newNode;
+        }
+        else{
+            System.out.println("Error 291");
+            return null;
         }
     }
 
@@ -298,28 +300,28 @@ public class GeneticProgram {
      * @return True means me have exceeded max depth. False means we have not exceeded max depth
      */
     public boolean fixDepth(Node root, int depth){
-        // if(depth > maxDepth){
-        //     return true;
-        // }
-        
-        // if(root != null){
-        //     root.setDepth(depth);
-        //     root.setID(UUID.randomUUID().toString());//make the id's of the clones unique after processing
-        //     fixDepth(root.getLeftChild(), depth+1);
-        //     fixDepth(root.getRightChild(),depth+1);
-        //     return false;
-        // }
-        // return false;
-
         if(root == null)
             return false;
-        else if(depth > maxDepth)
+        else if(depth > maxDepth){
+            root.setDepth(depth);
+            root.setID(UUID.randomUUID().toString());
+            fixDepth(root.getLeftChild(), depth+1);
+            fixDepth(root.getRightChild(),depth+1);
             return true;
+        }
+            // return true;
         else{
             root.setDepth(depth);
+            root.setID(UUID.randomUUID().toString());
             boolean left = fixDepth(root.getLeftChild(), depth+1);
             boolean right = fixDepth(root.getRightChild(),depth+1);
-            return left && right;
+            // return left && right;
+            if(left)
+                return left;
+            else if(right)
+                return right;
+            else
+                return false;
         }
     }
 
@@ -426,7 +428,7 @@ public class GeneticProgram {
         }
         meanAbsoluteError = new MAE();
         meanAbsolDev = new MedianAbsoluteDev(average);
-        rSquared = new RSquared();
+        rSquared = new RSquared(average);
         rmsd = new RMSD();
         executeTest(best,meanAbsoluteError,meanAbsolDev,rSquared,rmsd,reader);
         //Node best = getBestIndividual();

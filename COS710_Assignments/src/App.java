@@ -9,12 +9,12 @@ public class App {
     public static void main(String[] args) throws Exception {
         // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/dataset.csv";
         // String filename = "COS710_Assignments/src/dataset_reading_classes/data.csv";
-        String filename = "data.csv";
+        String filename = "150kData.csv";
 
 
         //max default depth should be 6 from textbook
         //populattion size of 500 seems to be sweet spot from textbook. Rarely need more
-        final int populationSize = 100;
+        final int populationSize = 100;//was 100
         final int maxDepth = 10;
         // final int seed = 808;//seed causing errors
         // final int seed = 11;
