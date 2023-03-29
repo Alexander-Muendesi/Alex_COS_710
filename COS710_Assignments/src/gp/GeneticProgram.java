@@ -397,15 +397,16 @@ public class GeneticProgram {
         //while termination condition is not met
         while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
-                System.out.println("Generation: " + generationCounter);
+                // System.out.println("Generation: " + generationCounter);
 
                 //evaluate the population
                 reader.trainData();
                 // printIndividual(getBestIndividual());
                 best = getBestIndividual();
-                System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
-                System.out.println("Best Depth: " + best.getDepth());
-                printIndividual(best);
+                // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
+                // System.out.println("Best Depth: " + best.getDepth());
+                if(generationCounter == numGenerations-1)
+                    printIndividual(best);
 
                 //select parents for next generation and apply genetic operators
                 List<Node> nodes = performCrossover(crossEnd, tournament);
@@ -416,8 +417,8 @@ public class GeneticProgram {
                 generationCounter++;
 
                 nodes = null;
-                System.out.println("____________________________________________________________________________");
-                System.out.println();
+                // System.out.println("____________________________________________________________________________");
+                // System.out.println();
                 System.gc();//clear whatever memory was being used
                 
 
@@ -431,13 +432,6 @@ public class GeneticProgram {
         rSquared = new RSquared(average);
         rmsd = new RMSD();
         executeTest(best,meanAbsoluteError,meanAbsolDev,rSquared,rmsd,reader);
-        //Node best = getBestIndividual();
-        //System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
-        //try {
-        //    printIndividual(best.getRoot());
-        //} catch (Exception e) {
-        //    e.printStackTrace();
-        //}
     }
 
     public void executeTest(Node best, MAE mae,MedianAbsoluteDev mad, RSquared rSquared, RMSD rmsd, DataReader reader){
@@ -515,7 +509,7 @@ public class GeneticProgram {
                 index = i;
             }
 
-        System.out.println("Fitness: "+population[index].getRawFitness());
+        // System.out.println("Fitness: "+population[index].getRawFitness());
         return population[index];
     }
 
