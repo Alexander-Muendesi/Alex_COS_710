@@ -44,8 +44,11 @@ public abstract class Node {
     public abstract Node[] getAllNodes(Node root);
     public abstract String getID();//used to identify a node so that .equals can compare corectly
     public abstract void setID(String id);
+
     public abstract double getRawFitness();
     public abstract void calcRawFitness(double actualVal,double predictedVal);
-
     public abstract Node[] getArguments();
+
+    public abstract int getSimilarityIndex();
+    public abstract void setSimilarityIndex(int similariryIndex);
 }

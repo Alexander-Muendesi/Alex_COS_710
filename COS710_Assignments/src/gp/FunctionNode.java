@@ -8,13 +8,16 @@ public class FunctionNode extends Node {
     private final int index;//basically we will have functions in a string array. This index identifies that function
     private Node[] arguments;//this will be the arguments of the function
     private final int numArguments = 2;//for now we are dealing with the binary arithmetic operators
+
     private final int leftChildIndex = 0;
     private final int rightChildIndex = 1;
     private int depth;//temporary maybe for printing purposes
-    private Node parent;
 
+    private Node parent;
     private double rawFitness;//since root node will be function, root node will have a fitness value
     private String id;
+
+    private int similarityIndex = 0;
 
     @Override
     public boolean equals(Object o){
@@ -214,5 +217,13 @@ public class FunctionNode extends Node {
 
     public String getID(){
         return this.id;
+    }
+
+    public int getSimilarityIndex(){
+        return this.similarityIndex;
+    }
+
+    public void setSimilarityIndex(int similariryIndex){
+        this.similarityIndex = similariryIndex;
     }
 }

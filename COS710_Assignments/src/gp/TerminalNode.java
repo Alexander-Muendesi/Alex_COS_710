@@ -150,4 +150,16 @@ public class TerminalNode extends Node{
     public void calcRawFitness(double actualVal,double predictedVal){
         rawFitness = rawFitness + Math.abs(predictedVal - actualVal);
     }
+
+    /**
+     * For terminal nodes will just return 0 as they will pretty much not match with anything.
+     * Only interested with Function Nodes for the similariry index
+     */
+    public int getSimilarityIndex(){
+        return 0;
+    }
+
+    public void setSimilarityIndex(int similariryIndex){
+        //stub
+    }
 }
