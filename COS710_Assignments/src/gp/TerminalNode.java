@@ -10,9 +10,14 @@ public class TerminalNode extends Node{
     private int depth;//temporary for printing purposes for now
     private double terminalValue;
     private Node parent;
+    private double rawFitness;
+    private String id;
 
     @Override
     public boolean equals(Object o){
+        if(o == null)
+            return false;
+        
         if(o == this){
             return true;
         }
@@ -21,31 +26,32 @@ public class TerminalNode extends Node{
             return false;
 
         TerminalNode fNode = (TerminalNode)o;
-
-        try {
-            return terminalValue == fNode.terminalValue && index == fNode.index && depth == fNode.depth
-                && parent.getValue() == fNode.parent.getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return this.id.equals(fNode.getID());
     }
 
-    public TerminalNode(int index, int depth, Node parent){
+    public TerminalNode(int index, int depth, Node parent, String id){
         this.depth = depth;
         this.index = index;
         this.parent = parent;
+        this.id = id;
+        this.rawFitness = 0;
     }
 
-    public TerminalNode(int index, int depth, Node parent, double terminalValue){
+    public TerminalNode(int index, int depth, Node parent, double terminalValue, String id){
         this.index = index;
         this.depth = depth;
         this.parent = parent;
         this.terminalValue = terminalValue;
+        this.id = id;
+        this.rawFitness = 0;//think set it to 0 since we will be recalculating it in new population maybe??
     }
 
-    public Node clone(){
-        return new TerminalNode(index, depth, parent, terminalValue);
+    public TerminalNode(int index, int depth,double terminalValue, String id){
+        this.index = index;
+        this.depth = depth;
+        this.terminalValue = terminalValue;
+        this.id = id;
+        this.rawFitness = 0;//think set it to 0 since we will be recalculating it in new population maybe??
     }
 
     public Node getParent(){
@@ -54,6 +60,10 @@ public class TerminalNode extends Node{
 
     public void setParent(Node parent){
         this.parent = parent;
+    }
+
+    public Node[] getArguments(){
+        return null;
     }
 
     // public double evaluate(double[] input){//might change this to a linkedhashset or something since data is in linkedHashSet.
@@ -89,9 +99,9 @@ public class TerminalNode extends Node{
                 nodes.add(fNode.getLeftChild());
                 nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
             }
-            else if(i != 0 && curr instanceof TerminalNode){
-                nodes.add(curr);//add a terminal node
-            }
+            // else if(i != 0 && curr instanceof TerminalNode){
+            //     nodes.add(curr);//add a terminal node
+            // }
         }
 
         return nodes.toArray(new Node[nodes.size()]);
@@ -119,5 +129,37 @@ public class TerminalNode extends Node{
 
     public void setDepth(int depth){
         this.depth = depth;
+    }
+
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return this.id;
+    }
+
+    public double getRawFitness(){
+        return this.rawFitness;
+    }
+
+    public int getIndex(){
+        return this.index;
+    }
+
+    public void calcRawFitness(double actualVal,double predictedVal){
+        rawFitness = rawFitness + Math.abs(predictedVal - actualVal);
+    }
+
+    /**
+     * For terminal nodes will just return 0 as they will pretty much not match with anything.
+     * Only interested with Function Nodes for the similariry index
+     */
+    public int getSimilarityIndex(){
+        return 0;
+    }
+
+    public void setSimilarityIndex(int similariryIndex){
+        //stub
     }
 }

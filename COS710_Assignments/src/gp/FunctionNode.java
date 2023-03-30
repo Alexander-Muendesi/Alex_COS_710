@@ -8,15 +8,22 @@ public class FunctionNode extends Node {
     private final int index;//basically we will have functions in a string array. This index identifies that function
     private Node[] arguments;//this will be the arguments of the function
     private final int numArguments = 2;//for now we are dealing with the binary arithmetic operators
+
     private final int leftChildIndex = 0;
     private final int rightChildIndex = 1;
     private int depth;//temporary maybe for printing purposes
-    private Node parent;
 
+    private Node parent;
     private double rawFitness;//since root node will be function, root node will have a fitness value
+    private String id;
+
+    private int similarityIndex = 0;
 
     @Override
     public boolean equals(Object o){
+        if(o == null)
+            return false;
+
         if(o == this){
             return true;
         }
@@ -25,44 +32,43 @@ public class FunctionNode extends Node {
             return false;
 
         FunctionNode tNode = (FunctionNode)o;
-
-        try {
-            return tNode.index == this.index && tNode.depth == this.depth && tNode.rawFitness == this.rawFitness
-                && parent.getValue() == tNode.parent.getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } 
+        return this.id.equals(tNode.getID());
     }
-    public FunctionNode(int index, int depth, Node parent){
+    public FunctionNode(int index, int depth, Node parent, String id){
         this.index = index;
         this.depth = depth;
         arguments = new Node[numArguments];
         rawFitness = 0;
         this.parent = parent;
+        this.id = id;
     }
 
-    public FunctionNode(int index,Node[] arguments,int depth, Node parent, double rawFitness){
+    public FunctionNode(int index,int depth, Node parent, double rawFitness, String id){
         this.index = index;
         this.depth = depth;
         this.parent = parent;
         this.arguments = new Node[numArguments];
-        this.rawFitness = rawFitness;
-
-        for(int i=0;i < numArguments;i++)
-            this.arguments[i] = arguments[i].clone();
+        // this.rawFitness = rawFitness;
+        this.rawFitness = 0;
+        this.id = id;
     }
 
-    public Node clone(){
-        return new FunctionNode(index,arguments,depth,parent,rawFitness);
-    }
+    
 
     public Node getParent(){
         return this.parent;
     }
 
+    public Node[] getArguments(){
+        return this.arguments;
+    }
+
     public void setParent(Node parent){
         this.parent = parent;
+    }
+
+    public int getIndex(){
+        return this.index;
     }
 
     /***
@@ -192,9 +198,6 @@ public class FunctionNode extends Node {
                 nodes.add(fNode.getLeftChild());
                 nodes.add(fNode.getRightChild());//note if you decided to add other operators have to add arity stuff here
             }
-            //else if(i != 0 && curr instanceof TerminalNode){
-            //    nodes.add(curr);//add a terminal node
-            //}
         }
 
         return nodes.toArray(new Node[nodes.size()]);
@@ -208,4 +211,19 @@ public class FunctionNode extends Node {
         this.depth = depth;
     }
 
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return this.id;
+    }
+
+    public int getSimilarityIndex(){
+        return this.similarityIndex;
+    }
+
+    public void setSimilarityIndex(int similariryIndex){
+        this.similarityIndex = similariryIndex;
+    }
 }
