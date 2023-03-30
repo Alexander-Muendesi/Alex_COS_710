@@ -18,18 +18,33 @@ public class GeneticProgram {
     private final int populationSize;
     private final int maxDepth;
     private final int numTerminals = 24;
+
     private final int numFunctions = 4;
     private final int tournamentSize;
     private final Random random;
+
     private Node[] population;
     private final int numGenerations;
     private final double mutationRate;
+
     private final double crossoverRate;
     private final int maxOffspringDepth;
     public MAE meanAbsoluteError;
+
     public MedianAbsoluteDev meanAbsolDev;
     public RMSD rmsd;
     public RSquared rSquared;
+
+    private final int maxGlobalDepthIndex = 3;//this is depth where we start counting the similarity
+    private final int maxGlobalGenerationsIndex = 10;//allow 10 generations to pass for the global similar nodes to settle down
+
+    //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
+    //for 5 consercutive generations
+    private Node globalSimilarityNode = null;
+    private Node tempGlobalSimilaryNode = null;
+
+    private final int globalSimilarityThreshhold = 2;
+    private final int localSimilarityThreshhold = 4;//might need to change this
 
     /**
      * Constructor which initializes various constants for the genetic progrma
@@ -403,6 +418,8 @@ public class GeneticProgram {
                 reader.trainData();
                 // printIndividual(getBestIndividual());
                 best = getBestIndividual();
+
+                
                 // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
                 // System.out.println("Best Depth: " + best.getDepth());
                 if(generationCounter == numGenerations-1)
@@ -513,5 +530,30 @@ public class GeneticProgram {
         return population[index];
     }
 
+    public int calculateSimilarityIndex(Node node, int similarity){
+        if(node == null)
+            return 0;
+        else if(node instanceof FunctionNode){
+            try {
+                if(globalSimilarityNode.getValue().equals(node.getValue())){
+                    int left = calculateSimilarityIndex(node.getLeftChild(), similarity+1);
+                    int right = calculateSimilarityIndex(node.getRightChild(), similarity+1);
 
+                    return left + right;
+                }
+                else{
+                    int left = calculateSimilarityIndex(node.getLeftChild(), similarity);
+                    int right = calculateSimilarityIndex(node.getRightChild(), similarity);
+
+                    return left + right;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(-1);
+                return Integer.MAX_VALUE;
+            }
+        }
+        else//assume instance of Terminal node
+            return 0;
+    }
 }
