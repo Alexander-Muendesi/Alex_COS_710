@@ -40,8 +40,8 @@ public class GeneticProgram {
 
     //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
     //for 5 consercutive generations
-    private Node globalSimilarityNode = null;
-    private Node tempGlobalSimilaryNode = null;
+    private Node globalSimilarityRoot = null;
+    private Node tempGlobalSimilaryRoot = null;
 
     private final int globalSimilarityThreshhold = 2;
     private final int localSimilarityThreshhold = 4;//might need to change this
@@ -419,7 +419,9 @@ public class GeneticProgram {
                 // printIndividual(getBestIndividual());
                 best = getBestIndividual();
 
-                
+                if(generationCounter == maxGlobalGenerationsIndex){
+
+                }
                 // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
                 // System.out.println("Best Depth: " + best.getDepth());
                 if(generationCounter == numGenerations-1)
@@ -530,20 +532,27 @@ public class GeneticProgram {
         return population[index];
     }
 
-    public int calculateSimilarityIndex(Node node, int similarity){
+    /**
+     * 
+     * @param gsr Root of the Global Similarity Tree
+     * @param node Node which we want to compare to 
+     * @param similarity Just a counter for the similarity =
+     * @return The similarit of node to gsr
+     */
+    public int calculateSimilarityIndex(Node gsr, Node node, int similarity){
         if(node == null)
             return 0;
         else if(node instanceof FunctionNode){
             try {
-                if(globalSimilarityNode.getValue().equals(node.getValue())){
-                    int left = calculateSimilarityIndex(node.getLeftChild(), similarity+1);
-                    int right = calculateSimilarityIndex(node.getRightChild(), similarity+1);
+                if(globalSimilarityRoot.getValue().equals(node.getValue())){
+                    int left = calculateSimilarityIndex(gsr.getLeftChild(),node.getLeftChild(), similarity+1);
+                    int right = calculateSimilarityIndex(gsr.getRightChild(),node.getRightChild(), similarity+1);
 
                     return left + right;
                 }
                 else{
-                    int left = calculateSimilarityIndex(node.getLeftChild(), similarity);
-                    int right = calculateSimilarityIndex(node.getRightChild(), similarity);
+                    int left = calculateSimilarityIndex(gsr.getLeftChild(),node.getLeftChild(), similarity);
+                    int right = calculateSimilarityIndex(gsr.getRightChild(),node.getRightChild(), similarity);
 
                     return left + right;
                 }
