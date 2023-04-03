@@ -11,7 +11,8 @@ public class App {
         int maxDepth = 10;
         int seed = 2;
         int tournamentSize = 4;
-        int numGenerations = 50;
+        // int numGenerations = 50;
+        int numGenerations = 150;
         double mutationRate = 0.70;
         double crossoverRate = 0.30;
         int maxOffspringDepth = 2;

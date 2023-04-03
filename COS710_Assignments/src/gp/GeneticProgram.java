@@ -35,7 +35,7 @@ public class GeneticProgram {
     public RMSD rmsd;
     public RSquared rSquared;
 
-    private final int maxGlobalDepthIndex = 2;//this is depth where we start counting the similarity
+    private final int maxGlobalDepthIndex = 1;//this is depth where we start counting the similarity
     private final int maxGlobalGenerationsIndex = 5;//allow 10 generations to pass for the global similar nodes to settle down
 
     //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
@@ -449,7 +449,7 @@ public class GeneticProgram {
         generatePopulation();
         Node best = null;
         //while termination condition is not met
-        while(generationCounter < numGenerations){//temporary condition. Replace later
+        while((best != null && best.getRawFitness() < 717309) || generationCounter < numGenerations){//temporary condition. Replace later
             try {
                 System.out.println("Generation: " + generationCounter);
 
@@ -459,15 +459,15 @@ public class GeneticProgram {
                 best = getBestIndividual();
 
                 //after 10 iterations set the tree to represent the global similarity nodes
-                // if(generationCounter == maxGlobalGenerationsIndex){
-                if(generationCounter == 5){
+                // if(generationCounter == 5){
+                if(generationCounter == maxGlobalGenerationsIndex){
                     globalSimilarityRoot = best.getRoot();
                     generateNewStructurePopulation();
                 }
 
                 //check if the global nodes are changing
-                // if(generationCounter > maxGlobalGenerationsIndex){
-                if(generationCounter > 2){
+                // if(generationCounter > 2){
+                if(generationCounter > maxGlobalGenerationsIndex){
                     // System.out.println("Generation Counter: " + generationCounter);
                     int result = calculateGlobalSimilarityIndex(globalSimilarityRoot, best);
                     // System.out.println("Result: " + result);
@@ -477,7 +477,7 @@ public class GeneticProgram {
                     }
                     else{
                         // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
-                        if(gCounter > 5){
+                        if(gCounter > 10){
                             // prevGlobalSimilarityRoot = globalSimilarityRoot;
                             prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
@@ -531,8 +531,7 @@ public class GeneticProgram {
         Node rootClone = cloneTree(globalSimilarityRoot, null);
         rootClone = stripNodes(rootClone);//remove nodes that below depth n
 
-        population[0]  = cloneTree(globalSimilarityRoot, null);//don't get rid of best local nodes from best tree
-        for(int i=1; i<populationSize;i++){
+        for(int i=0; i<populationSize;i++){
             population[i] = cloneTree(rootClone, null);
             population[i] = createStructureTree(population[i]);
         }
