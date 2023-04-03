@@ -35,16 +35,16 @@ public class GeneticProgram {
     public RMSD rmsd;
     public RSquared rSquared;
 
-    private final int maxGlobalDepthIndex = 3;//this is depth where we start counting the similarity
+    private final int maxGlobalDepthIndex = 2;//this is depth where we start counting the similarity
     private final int maxGlobalGenerationsIndex = 5;//allow 10 generations to pass for the global similar nodes to settle down
 
     //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
     //for 5 consercutive generations
     private Node globalSimilarityRoot = null;
 
-    private final int globalSimilarityThreshhold = 2;
-    private final int localSimilarityThreshhold = 4;//might need to change this
-    private Node prevGlobalSimilarityRoot = null;
+    private final int globalSimilarityThreshhold = 8;
+    private final double localSimilarityThreshhold = 0.7;//percentage showing how similar the nodes are
+    private List<Node> prevGlobalSimilarityRoot = new ArrayList<Node>();
 
     /**
      * Constructor which initializes various constants for the genetic progrma
@@ -143,16 +143,18 @@ public class GeneticProgram {
         while(queue.isEmpty() == false){
             Node node = queue.remove();
 
-            if(node.getDepth() > currentDepth || node.getDepth() == root.getDepth()){
-                System.out.println();
-                currentDepth = node.getDepth();
-            }
-            System.out.print("D("+ node.getDepth() + "): " + node.getValue() + " ");
-
-            if(node instanceof FunctionNode){
-                FunctionNode functionNode = (FunctionNode) node;
-                queue.add(functionNode.getLeftChild());
-                queue.add(functionNode.getRightChild());
+            if(node != null){
+                if(node.getDepth() > currentDepth || node.getDepth() == root.getDepth()){
+                    System.out.println();
+                    currentDepth = node.getDepth();
+                }
+                System.out.print("D("+ node.getDepth() + "): " + node.getValue() + " ");
+    
+                if(node instanceof FunctionNode){
+                    FunctionNode functionNode = (FunctionNode) node;
+                    queue.add(functionNode.getLeftChild());
+                    queue.add(functionNode.getRightChild());
+                }
             }
         }
         System.out.println();
@@ -381,6 +383,20 @@ public class GeneticProgram {
         int index = random.nextInt(nodes.length);
         Node mutationPoint = nodes[index];
 
+        //make sure global nodes are not affected
+        if(globalSimilarityRoot != null){
+            int numIterations = 0;
+            while(true && numIterations < 10){
+                if(mutationPoint.getDepth() <= maxGlobalDepthIndex){
+                    index = random.nextInt(nodes.length);
+                    mutationPoint = nodes[index];
+                    numIterations++;
+                }
+                else
+                    break;
+            }
+        }
+
         Node newSubtree = grow(maxOffspringDepth,mutationPoint.getParent(),0);
         Node result = null;
 
@@ -435,35 +451,38 @@ public class GeneticProgram {
         //while termination condition is not met
         while(generationCounter < numGenerations){//temporary condition. Replace later
             try {
-                // System.out.println("Generation: " + generationCounter);
+                System.out.println("Generation: " + generationCounter);
 
                 //evaluate the population
                 reader.trainData();
-                // printIndividual(getBestIndividual());
+                printIndividual(getBestIndividual());
                 best = getBestIndividual();
 
                 //after 10 iterations set the tree to represent the global similarity nodes
                 // if(generationCounter == maxGlobalGenerationsIndex){
                 if(generationCounter == 5){
                     globalSimilarityRoot = best.getRoot();
+                    generateNewStructurePopulation();
                 }
 
                 //check if the global nodes are changing
                 // if(generationCounter > maxGlobalGenerationsIndex){
-                if(generationCounter > 5){
-                    System.out.println("Generation Counter: " + generationCounter);
+                if(generationCounter > 2){
+                    // System.out.println("Generation Counter: " + generationCounter);
                     int result = calculateGlobalSimilarityIndex(globalSimilarityRoot, best);
-                    System.out.println("Result: " + result);
+                    // System.out.println("Result: " + result);
                     if(!once){
                         prevGlobalSimilarity = result;
                         once = true;
                     }
                     else{
                         // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
-                        if(gCounter > 2){
-                            prevGlobalSimilarityRoot = globalSimilarityRoot;
+                        if(gCounter > 5){
+                            // prevGlobalSimilarityRoot = globalSimilarityRoot;
+                            prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
                             prevGlobalSimilarity = result;
+                            generateNewStructurePopulation();
 
                             gCounter = 1;
                         }
@@ -488,8 +507,8 @@ public class GeneticProgram {
                 generationCounter++;
 
                 nodes = null;
-                // System.out.println("____________________________________________________________________________");
-                // System.out.println();
+                System.out.println("____________________________________________________________________________");
+                System.out.println();
                 System.gc();//clear whatever memory was being used
                 
 
@@ -503,6 +522,59 @@ public class GeneticProgram {
         rSquared = new RSquared(average);
         rmsd = new RMSD();
         executeTest(best,meanAbsoluteError,meanAbsolDev,rSquared,rmsd,reader);
+    }
+
+    /**
+     * This method creates a population with fixed nodes from the root up to depth n using the GlobalSimilarityRoot
+     */
+    public void generateNewStructurePopulation(){
+        Node rootClone = cloneTree(globalSimilarityRoot, null);
+        rootClone = stripNodes(rootClone);//remove nodes that below depth n
+
+        population[0]  = cloneTree(globalSimilarityRoot, null);//don't get rid of best local nodes from best tree
+        for(int i=1; i<populationSize;i++){
+            population[i] = cloneTree(rootClone, null);
+            population[i] = createStructureTree(population[i]);
+        }
+    }
+
+    /**
+     * This method removes all nodes below depth n
+     * @param input
+     */
+    public Node stripNodes(Node root){
+        if(root == null)
+            return root;
+
+        if(root.getDepth() > maxGlobalDepthIndex){
+            root = null;
+            return root;
+        }
+        else{
+            root.setLeftChild(stripNodes(root.getLeftChild()));
+            root.setRightChild(stripNodes(root.getRightChild()));
+            return root;
+        }
+    }
+
+    /**
+     * This method creates a new tree with the fixed nodes up to depth n
+     * @param root
+     */
+    public Node createStructureTree(Node root){
+        if(root == null)
+            return root;
+
+        if(root.getDepth() == maxGlobalDepthIndex && root instanceof FunctionNode){
+            root.setLeftChild(grow(maxDepth,root,maxGlobalDepthIndex+1));
+            root.setRightChild(grow(maxDepth,root,maxGlobalDepthIndex+1));
+            return root;
+        }
+        else{
+            root.setLeftChild(createStructureTree(root.getLeftChild()));
+            root.setRightChild(createStructureTree(root.getRightChild()));
+            return root;
+        }
     }
 
     public void executeTest(Node best, MAE mae,MedianAbsoluteDev mad, RSquared rSquared, RMSD rmsd, DataReader reader){
@@ -531,6 +603,46 @@ public class GeneticProgram {
             Node parentTwo = tournament.calcTSelection(population);
 
             Node[] offSpring = subtreeCrossover(parentOne, parentTwo);
+
+            //prevent trees from being created that are similar to a previous optimum 
+            // if(prevGlobalSimilarityRoot != null){
+            if(prevGlobalSimilarityRoot.isEmpty() == false){
+                    for(int i=0;i<offSpring.length;i++){
+                        int counter2 = 0;//used to prevent infinite loop
+                        while(true && counter2 < 10){
+                            Boolean allDifferent = true;
+                            for(Node index: prevGlobalSimilarityRoot){
+                                if((calculateLocalSimilarityIndex(index, offSpring[i])) >localSimilarityThreshhold){
+                                        Node[] tempOffspring = subtreeCrossover(parentOne, parentTwo);
+                                        for (Node node : tempOffspring) {
+                                            if((calculateLocalSimilarityIndex(index, node)) < localSimilarityThreshhold)
+                                                offSpring[i] = node;
+                                        }
+                                }
+                                for(Node index2: prevGlobalSimilarityRoot){
+                                    if((calculateLocalSimilarityIndex(index2, offSpring[i])) > localSimilarityThreshhold)
+                                        allDifferent = false;
+                                }
+                            }
+                            if(allDifferent)
+                                break;
+                            counter2++;
+
+
+                            // if((calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, offSpring[i])) >localSimilarityThreshhold){
+                            //     Node[] tempOffspring = subtreeCrossover(parentOne, parentTwo);
+                            //     for (Node node : tempOffspring) {
+                            //         if((calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, node)) < localSimilarityThreshhold)
+                            //             offSpring[i] = node;
+                            //     }
+                            //     counter2++;
+                            // }
+                            // else
+                            //     break;
+
+                        }
+                    }
+            }
             if(offSpring.length == 1){
                 nodes.add(offSpring[0]);
                 counter++;
@@ -559,7 +671,45 @@ public class GeneticProgram {
     public Node[] performMutation(int mutationStart,TSelection tournament,List<Node> nodes){
         for(int i=mutationStart;i<populationSize;i++){
             Node parentOne = tournament.calcTSelection(population);
-            nodes.add(mutate(parentOne));
+
+            Node result = mutate(parentOne);
+
+            // if(prevGlobalSimilarityRoot != null){
+            if(prevGlobalSimilarityRoot.isEmpty() == false){
+                int numIterations = 0;
+                while(true && numIterations < 10){
+                    Boolean allDifferent = true;
+                    for(Node index: prevGlobalSimilarityRoot){
+                        if(calculateLocalSimilarityIndex(index, result) > localSimilarityThreshhold){
+                            Node tempOffSpring = mutate(parentOne);
+    
+                            for(Node index2: prevGlobalSimilarityRoot){
+                                if(calculateLocalSimilarityIndex(index2, tempOffSpring) < localSimilarityThreshhold)
+                                    result = tempOffSpring;
+                                else
+                                    allDifferent = false;
+                            }
+                        }
+                    }
+
+                    numIterations++;
+                    if(allDifferent)
+                        break;
+                    // if(calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, result) > localSimilarityThreshhold){
+                    //     Node tempOffSpring = mutate(parentOne);
+
+                    //     if(calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, tempOffSpring) < localSimilarityThreshhold)
+                    //         result = tempOffSpring;
+
+                    //     numIterations++;
+                    // }
+                    // else{
+                    //     break;
+                    // }
+                }
+
+            }
+            nodes.add(result);
         }
         if(nodes.contains(null))
             System.out.println("null if from mutation");
@@ -580,7 +730,7 @@ public class GeneticProgram {
                 index = i;
             }
 
-        // System.out.println("Fitness: "+population[index].getRawFitness());
+        System.out.println("Fitness: "+population[index].getRawFitness());
         return population[index];
     }
 
@@ -589,21 +739,27 @@ public class GeneticProgram {
      * @param gsr Root of the Global Similarity Tree
      * @param node Node which we want to compare to 
      * @param similarity Just a counter for the similarity =
-     * @return The similarity of node to gsr
+     * @return The similarity of node to gsr as a percentage
      */
-    public int calculateLocalSimilarityIndex(Node gsr, Node node){
+    public double calculateLocalSimilarityIndex(Node gsr, Node node){
         if(gsr == null || node == null)
             return 0;
         
         int count = 0;
+        int numNodes = 0;
         if(node instanceof FunctionNode && gsr instanceof FunctionNode){
             try {
                 if(gsr.getValue().equals(node.getValue()) && node.getDepth() > maxGlobalDepthIndex && gsr.getDepth() > maxGlobalDepthIndex && node.getDepth() == gsr.getDepth()){
                     count++;
+                    numNodes++;
                     count += calculateLocalSimilarityIndex(gsr.getLeftChild(),node.getLeftChild());
                     count += calculateLocalSimilarityIndex(gsr.getRightChild(),node.getRightChild());
 
-                    return count;
+                    return (double)count / numNodes;
+                }
+                else if(node.getDepth() > maxGlobalDepthIndex && gsr.getDepth() > maxGlobalDepthIndex && node.getDepth() == gsr.getDepth()){
+                    numNodes++;
+                    return 0;
                 }
                 else{
                     return 0;
