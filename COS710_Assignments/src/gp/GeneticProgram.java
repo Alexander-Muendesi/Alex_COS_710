@@ -36,7 +36,7 @@ public class GeneticProgram {
     public RSquared rSquared;
 
     private final int maxGlobalDepthIndex = 3;//this is depth where we start counting the similarity
-    private final int maxGlobalGenerationsIndex = 10;//allow 10 generations to pass for the global similar nodes to settle down
+    private final int maxGlobalGenerationsIndex = 5;//allow 10 generations to pass for the global similar nodes to settle down
 
     //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
     //for 5 consercutive generations
@@ -45,6 +45,7 @@ public class GeneticProgram {
 
     private final int globalSimilarityThreshhold = 2;
     private final int localSimilarityThreshhold = 4;//might need to change this
+    private Node prevGlobalSimilarityRoot = null;
 
     /**
      * Constructor which initializes various constants for the genetic progrma
@@ -425,13 +426,13 @@ public class GeneticProgram {
 
                 //after 10 iterations set the tree to represent the global similarity nodes
                 // if(generationCounter == maxGlobalGenerationsIndex){
-                if(generationCounter == 0){
+                if(generationCounter == 5){
                     globalSimilarityRoot = best.getRoot();
                 }
 
                 //check if the global nodes are changing
                 // if(generationCounter > maxGlobalGenerationsIndex){
-                if(generationCounter > 0){
+                if(generationCounter > 5){
                     System.out.println("Generation Counter: " + generationCounter);
                     int result = calculateGlobalSimilarityIndex(globalSimilarityRoot, best);
                     System.out.println("Result: " + result);
@@ -441,6 +442,7 @@ public class GeneticProgram {
                     }
                     else{
                         if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
+                            prevGlobalSimilarityRoot = globalSimilarityRoot;
                             globalSimilarityRoot = best.getRoot();
                             prevGlobalSimilarity = result;
 
