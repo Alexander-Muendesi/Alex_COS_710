@@ -405,6 +405,10 @@ public class GeneticProgram {
         int crossEnd = (int) (populationSize * crossoverRate);
 
         int mutationStart = crossEnd+1;
+        int prevGlobalSimilarity = 0;
+
+        boolean once = false;
+        int gCounter = 1;//basically this will change the global similarity root if the counter gets a value of 2.
 
         //initialize the population
         generatePopulation();
@@ -419,9 +423,36 @@ public class GeneticProgram {
                 // printIndividual(getBestIndividual());
                 best = getBestIndividual();
 
-                if(generationCounter == maxGlobalGenerationsIndex){
-
+                //after 10 iterations set the tree to represent the global similarity nodes
+                // if(generationCounter == maxGlobalGenerationsIndex){
+                if(generationCounter == 0){
+                    globalSimilarityRoot = best.getRoot();
                 }
+
+                //check if the global nodes are changing
+                // if(generationCounter > maxGlobalGenerationsIndex){
+                if(generationCounter > 0){
+                    System.out.println("Generation Counter: " + generationCounter);
+                    int result = calculateGlobalSimilarityIndex(globalSimilarityRoot, best);
+                    System.out.println("Result: " + result);
+                    if(!once){
+                        prevGlobalSimilarity = result;
+                        once = true;
+                    }
+                    else{
+                        if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
+                            globalSimilarityRoot = best.getRoot();
+                            prevGlobalSimilarity = result;
+
+                            gCounter = 1;
+                        }
+                        else{
+                            prevGlobalSimilarity = result;
+                            gCounter++;
+                        }
+                    }
+                }
+
                 // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
                 // System.out.println("Best Depth: " + best.getDepth());
                 if(generationCounter == numGenerations-1)
@@ -537,32 +568,59 @@ public class GeneticProgram {
      * @param gsr Root of the Global Similarity Tree
      * @param node Node which we want to compare to 
      * @param similarity Just a counter for the similarity =
-     * @return The similarit of node to gsr
+     * @return The similarity of node to gsr
      */
-    public int calculateSimilarityIndex(Node gsr, Node node, int similarity){
-        if(node == null)
+    public int calculateLocalSimilarityIndex(Node gsr, Node node){
+        if(gsr == null || node == null)
             return 0;
-        else if(node instanceof FunctionNode){
+        
+        int count = 0;
+        if(node instanceof FunctionNode && gsr instanceof FunctionNode){
             try {
-                if(globalSimilarityRoot.getValue().equals(node.getValue())){
-                    int left = calculateSimilarityIndex(gsr.getLeftChild(),node.getLeftChild(), similarity+1);
-                    int right = calculateSimilarityIndex(gsr.getRightChild(),node.getRightChild(), similarity+1);
+                if(gsr.getValue().equals(node.getValue()) && node.getDepth() > maxGlobalDepthIndex && gsr.getDepth() > maxGlobalDepthIndex && node.getDepth() == gsr.getDepth()){
+                    count++;
+                    count += calculateLocalSimilarityIndex(gsr.getLeftChild(),node.getLeftChild());
+                    count += calculateLocalSimilarityIndex(gsr.getRightChild(),node.getRightChild());
 
-                    return left + right;
+                    return count;
                 }
                 else{
-                    int left = calculateSimilarityIndex(gsr.getLeftChild(),node.getLeftChild(), similarity);
-                    int right = calculateSimilarityIndex(gsr.getRightChild(),node.getRightChild(), similarity);
-
-                    return left + right;
+                    return 0;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(-1);
-                return Integer.MAX_VALUE;
+                return Integer.MIN_VALUE;
             }
         }
-        else//assume instance of Terminal node
+        else
+            return 0;
+    }
+
+    public int calculateGlobalSimilarityIndex(Node gsr, Node node){
+        if(gsr == null || node == null){
+            return 0;
+        }
+
+        int count = 0;
+        if(node instanceof FunctionNode && gsr instanceof FunctionNode){
+            try {
+                if(gsr.getValue().equals(node.getValue()) && node.getDepth() <= maxGlobalDepthIndex && gsr.getDepth() <= maxGlobalDepthIndex && node.getDepth() == gsr.getDepth()){
+                    count++;
+                    count += calculateGlobalSimilarityIndex(gsr.getLeftChild(),node.getLeftChild());
+                    count += calculateGlobalSimilarityIndex(gsr.getRightChild(),node.getRightChild());
+                    return count;
+                }
+                else{
+                    return 0;//this might lead to a potential error
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(-1);
+                return Integer.MIN_VALUE;
+            }
+        }
+        else
             return 0;
     }
 }
