@@ -13,8 +13,10 @@ public class App {
         int tournamentSize = 4;
         // int numGenerations = 50;
         int numGenerations = 150;
-        double mutationRate = 0.70;
-        double crossoverRate = 0.30;
+        // double mutationRate = 0.70;
+        double mutationRate = 0.80;
+        // double crossoverRate = 0.30;
+        double crossoverRate = 0.20;
         int maxOffspringDepth = 2;
 
 

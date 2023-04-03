@@ -477,7 +477,7 @@ public class GeneticProgram {
                     }
                     else{
                         // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
-                        if(gCounter > 10){
+                        if(gCounter > 20){//was 10
                             // prevGlobalSimilarityRoot = globalSimilarityRoot;
                             prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
