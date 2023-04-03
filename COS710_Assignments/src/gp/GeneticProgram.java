@@ -41,7 +41,6 @@ public class GeneticProgram {
     //this will be the node against which the similarity index is calculated. Its only changed if the global nodes similarity are different from current
     //for 5 consercutive generations
     private Node globalSimilarityRoot = null;
-    private Node tempGlobalSimilaryRoot = null;
 
     private final int globalSimilarityThreshhold = 2;
     private final int localSimilarityThreshhold = 4;//might need to change this
@@ -185,9 +184,28 @@ public class GeneticProgram {
         //select a random node from each parent
         int index1 = random.nextInt(one.length);
         int index2 = random.nextInt(two.length);
+        
 
         Node node1 = one[index1];//crossover point root
         Node node2 = two[index2];//crossover point root
+
+        //the below if statement keeps nodes below maxGlobalDepthIndex constant. Only change whatever is below that area
+        if(globalSimilarityRoot != null){
+            int numIterations = 0;//exit that while loop after 10 iterations to reduce the runtime incase something stops it from finding node with depth greater than limit
+            while(true && numIterations < 10){
+                if(node1.getDepth() <= maxGlobalDepthIndex){
+                    index1 = random.nextInt(one.length);
+                    node1 = one[index1];
+                }
+                if(node2.getDepth() <= maxGlobalDepthIndex){
+                    index2 = random.nextInt(two.length);
+                    node2 = two[index2];
+                }
+                if(node1.getDepth() > maxGlobalDepthIndex && node2.getDepth() > maxGlobalDepthIndex)
+                    break;
+                numIterations++;
+            }
+        }
 
         Node node11 = onee[index1];
         Node node22 = twoo[index2];
@@ -441,7 +459,8 @@ public class GeneticProgram {
                         once = true;
                     }
                     else{
-                        if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
+                        // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
+                        if(gCounter > 2){
                             prevGlobalSimilarityRoot = globalSimilarityRoot;
                             globalSimilarityRoot = best.getRoot();
                             prevGlobalSimilarity = result;
