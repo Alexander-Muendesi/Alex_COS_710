@@ -14,9 +14,9 @@ public class App {
         // int numGenerations = 50;
         int numGenerations = 150;
         // double mutationRate = 0.70;
-        double mutationRate = 0.80;
+        double mutationRate = 0.90;
         // double crossoverRate = 0.30;
-        double crossoverRate = 0.20;
+        double crossoverRate = 0.10;
         int maxOffspringDepth = 2;
 
 

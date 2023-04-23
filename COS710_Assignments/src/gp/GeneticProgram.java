@@ -434,6 +434,8 @@ public class GeneticProgram {
      */
     public void executeTraining(TSelection tournament, DataReader reader){
         double average = reader.getDatasetAverage();
+        int numRuns = 10;//used for the number of runs before switching the global similarity root
+        System.out.println("numRuns: " + numRuns);
         // System.out.println("average: " + average);
 
         int generationCounter = 0;
@@ -449,7 +451,8 @@ public class GeneticProgram {
         generatePopulation();
         Node best = null;
         //while termination condition is not met
-        while((best != null && best.getRawFitness() < 717309) || generationCounter < numGenerations){//temporary condition. Replace later
+        //previous number was 717309
+        while((best != null && best.getRawFitness() < 500000) || generationCounter < numGenerations){//temporary condition. Replace later
             try {
                 System.out.println("Generation: " + generationCounter);
 
@@ -477,7 +480,7 @@ public class GeneticProgram {
                     }
                     else{
                         // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
-                        if(gCounter > 20){//was 10
+                        if(gCounter > numRuns){
                             // prevGlobalSimilarityRoot = globalSimilarityRoot;
                             prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
