@@ -434,8 +434,8 @@ public class GeneticProgram {
      */
     public void executeTraining(TSelection tournament, DataReader reader){
         double average = reader.getDatasetAverage();
-        int numRuns = 10;//used for the number of runs before switching the global similarity root
-        System.out.println("numRuns: " + numRuns);
+        int numRuns = 20;//20 is so far the best
+        System.out.println("Num Runs: " + numRuns);
         // System.out.println("average: " + average);
 
         int generationCounter = 0;
@@ -454,11 +454,11 @@ public class GeneticProgram {
         //previous number was 717309
         while((best != null && best.getRawFitness() < 500000) || generationCounter < numGenerations){//temporary condition. Replace later
             try {
-                System.out.println("Generation: " + generationCounter);
+                // System.out.println("Generation: " + generationCounter);
 
                 //evaluate the population
                 reader.trainData();
-                printIndividual(getBestIndividual());
+                // printIndividual(getBestIndividual());
                 best = getBestIndividual();
 
                 //after 10 iterations set the tree to represent the global similarity nodes
@@ -480,7 +480,7 @@ public class GeneticProgram {
                     }
                     else{
                         // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
-                        if(gCounter > numRuns){
+                        if(gCounter > numRuns){//was 10
                             // prevGlobalSimilarityRoot = globalSimilarityRoot;
                             prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
@@ -498,8 +498,8 @@ public class GeneticProgram {
 
                 // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
                 // System.out.println("Best Depth: " + best.getDepth());
-                if(generationCounter == numGenerations-1)
-                    printIndividual(best);
+                // if(generationCounter == numGenerations-1)
+                //     printIndividual(best);
 
                 //select parents for next generation and apply genetic operators
                 List<Node> nodes = performCrossover(crossEnd, tournament);
@@ -510,8 +510,8 @@ public class GeneticProgram {
                 generationCounter++;
 
                 nodes = null;
-                System.out.println("____________________________________________________________________________");
-                System.out.println();
+                // System.out.println("____________________________________________________________________________");
+                // System.out.println();
                 System.gc();//clear whatever memory was being used
                 
 
@@ -524,6 +524,16 @@ public class GeneticProgram {
         meanAbsolDev = new MedianAbsoluteDev(average);
         rSquared = new RSquared(average);
         rmsd = new RMSD();
+
+        //check which of the previous global optima are the best
+        for(Node node: prevGlobalSimilarityRoot)
+            if(node.getRawFitness() < best.getRawFitness())
+                best = node;
+        try {
+            printIndividual(best);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         executeTest(best,meanAbsoluteError,meanAbsolDev,rSquared,rmsd,reader);
     }
 
@@ -732,7 +742,7 @@ public class GeneticProgram {
                 index = i;
             }
 
-        System.out.println("Fitness: "+population[index].getRawFitness());
+        // System.out.println("Fitness: "+population[index].getRawFitness());
         return population[index];
     }
 
