@@ -42,7 +42,6 @@ public class GeneticProgram {
     //for 5 consercutive generations
     private Node globalSimilarityRoot = null;
 
-    private final int globalSimilarityThreshhold = 8;
     private final double localSimilarityThreshhold = 0.7;//percentage showing how similar the nodes are
     private List<Node> prevGlobalSimilarityRoot = new ArrayList<Node>();
 
@@ -436,7 +435,6 @@ public class GeneticProgram {
         double average = reader.getDatasetAverage();
         int numRuns = 20;//20 is so far the best
         System.out.println("Num Runs: " + numRuns);
-        // System.out.println("average: " + average);
 
         int generationCounter = 0;
         int crossEnd = (int) (populationSize * crossoverRate);
@@ -450,8 +448,8 @@ public class GeneticProgram {
         //initialize the population
         generatePopulation();
         Node best = null;
+        
         //while termination condition is not met
-        //previous number was 717309
         while((best != null && best.getRawFitness() < 500000) || generationCounter < numGenerations){//temporary condition. Replace later
             try {
                 // System.out.println("Generation: " + generationCounter);
@@ -479,14 +477,11 @@ public class GeneticProgram {
                         once = true;
                     }
                     else{
-                        // if(Math.abs(result- prevGlobalSimilarity) > globalSimilarityThreshhold || gCounter > 2){
                         if(gCounter > numRuns){//was 10
-                            // prevGlobalSimilarityRoot = globalSimilarityRoot;
                             prevGlobalSimilarityRoot.add(globalSimilarityRoot);
                             globalSimilarityRoot = best.getRoot();
                             prevGlobalSimilarity = result;
                             generateNewStructurePopulation();
-
                             gCounter = 1;
                         }
                         else{
@@ -495,11 +490,6 @@ public class GeneticProgram {
                         }
                     }
                 }
-
-                // System.out.println("Num Nodes in Fittest Individual: " + best.getAllNodes(best.getRoot()).length);
-                // System.out.println("Best Depth: " + best.getDepth());
-                // if(generationCounter == numGenerations-1)
-                //     printIndividual(best);
 
                 //select parents for next generation and apply genetic operators
                 List<Node> nodes = performCrossover(crossEnd, tournament);
@@ -617,7 +607,6 @@ public class GeneticProgram {
             Node[] offSpring = subtreeCrossover(parentOne, parentTwo);
 
             //prevent trees from being created that are similar to a previous optimum 
-            // if(prevGlobalSimilarityRoot != null){
             if(prevGlobalSimilarityRoot.isEmpty() == false){
                     for(int i=0;i<offSpring.length;i++){
                         int counter2 = 0;//used to prevent infinite loop
@@ -639,19 +628,6 @@ public class GeneticProgram {
                             if(allDifferent)
                                 break;
                             counter2++;
-
-
-                            // if((calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, offSpring[i])) >localSimilarityThreshhold){
-                            //     Node[] tempOffspring = subtreeCrossover(parentOne, parentTwo);
-                            //     for (Node node : tempOffspring) {
-                            //         if((calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, node)) < localSimilarityThreshhold)
-                            //             offSpring[i] = node;
-                            //     }
-                            //     counter2++;
-                            // }
-                            // else
-                            //     break;
-
                         }
                     }
             }
@@ -707,17 +683,6 @@ public class GeneticProgram {
                     numIterations++;
                     if(allDifferent)
                         break;
-                    // if(calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, result) > localSimilarityThreshhold){
-                    //     Node tempOffSpring = mutate(parentOne);
-
-                    //     if(calculateLocalSimilarityIndex(prevGlobalSimilarityRoot, tempOffSpring) < localSimilarityThreshhold)
-                    //         result = tempOffSpring;
-
-                    //     numIterations++;
-                    // }
-                    // else{
-                    //     break;
-                    // }
                 }
 
             }

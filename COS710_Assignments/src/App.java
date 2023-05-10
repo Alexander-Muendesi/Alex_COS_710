@@ -5,13 +5,13 @@ import gp.TSelection;
 public class App {
     public static void main(String[] args) throws Exception {
         // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/150kData.csv";
-        String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
-        // String filename = "150kData.csv";
+        // String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
+        String filename = "150kData.csv";
         int populationSize = 100;
         // int maxDepth = 10;
         int maxDepth = 6;
-        int seed = 2;
-        int tournamentSize = 3;
+        int seed = 0;
+        int tournamentSize = 4;
         // int numGenerations = 50;
         int numGenerations = 150;
         // double mutationRate = 0.70;
@@ -25,9 +25,8 @@ public class App {
 
         
         
-        for(int s=0;s<100;s++){
             System.out.println("\n************************************************************************************");
-            System.out.println("Seed: "+ s);
+            System.out.println("Seed: "+ seed);
             System.out.println("Population Size: " + populationSize);
             System.out.println("Max Depth: "  + maxDepth);
             System.out.println("Tournament Size: " + tournamentSize);
@@ -35,7 +34,7 @@ public class App {
             System.out.println("mutation rate: " + mutationRate);
             System.out.println("crossover rate: " + crossoverRate);
             System.out.println("max offspring depth: " + maxOffspringDepth);
-            GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,s,tournamentSize, numGenerations,mutationRate,crossoverRate,
+            GeneticProgram gp = new GeneticProgram(populationSize, maxDepth,seed,tournamentSize, numGenerations,mutationRate,crossoverRate,
             maxOffspringDepth);
 
             DataReader reader = new DataReader(filename,gp);
@@ -43,7 +42,6 @@ public class App {
             TSelection tournament = new TSelection(tournamentSize, gp.getRandom());
             gp.executeTraining(tournament, reader);
 
-        }
 
         
     }
