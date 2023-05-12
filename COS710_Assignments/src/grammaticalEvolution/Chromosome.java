@@ -10,6 +10,7 @@ public class Chromosome {
     private int maxNumCodons;
     private List<Codon> chromosome;
     private final int CODON_LENGTH = 8;
+    private int codonCounter = 0;
 
     public Chromosome(Random random, int numCodons, int maxNumCodons){
         this.random = random;
@@ -69,5 +70,18 @@ public class Chromosome {
             c.add(cdn.clone());
 
         return new Chromosome(random, c, numCodons, maxNumCodons);
+    }
+
+    public Codon getCodon(){
+        if(codonCounter < chromosome.size())
+            return chromosome.get(codonCounter++);
+        else{
+            codonCounter=0;
+            return chromosome.get(codonCounter);
+        }
+    }
+
+    public void resetCodonCounter(){
+        codonCounter = 0;
     }
 }
