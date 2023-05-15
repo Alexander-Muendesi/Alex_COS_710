@@ -41,21 +41,30 @@ public class GE {
         }
     }
 
-    public double expression(Chromosome c, Map<Integer, Double> data) throws Exception{
-        Codon codon = c.getCodon();
+    public double expression(Chromosome c, Map<Integer, Double> data, int codonIndex) throws Exception{
+        // for(Codon cc: c.getChromosome())
+            // System.out.print(cc.getDenaryValue() + " ");
+
+        codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : 0;
+
+        Codon codon = c.getCodon(codonIndex);
+        // System.out.println("codon value: " + codon.getDenaryValue() + " codon index: " + codonIndex);
         int productionRule = codon.getDenaryValue() % 2;
 
+        // System.out.println("\n ProductionRule: " + productionRule);
         if(productionRule == 0){
             //call expression
-            double left = expression(c, data);
+            // System.out.println("In rule 0");
+            double left = expression(c, data, codonIndex+1);
             //call operator
-            char  op = operator(c.getCodon());
+            char  op = operator(c.getCodon(codonIndex));
             //call expression again
-            double right = expression(c, data);
+            double right = expression(c, data, codonIndex+1);
+            // System.out.println("after right");
             return applyOperator(left,right,op);
         }
         else{
-            return terminal(c.getCodon(), data);
+            return terminal(c.getCodon(codonIndex), data);
         }
     }
 
@@ -96,7 +105,7 @@ public class GE {
     }
 
     public double terminal(Codon codon, Map<Integer, Double> data){
-        int productionRule = codon.getDenaryValue() % 25;//we have 24 input data elements to consider
+        int productionRule = codon.getDenaryValue() % 24;//we have 24 input data elements to consider
         return data.get(productionRule);
 
     }
@@ -115,10 +124,11 @@ public class GE {
             for(Map<Integer,Double> m: dataset){
                 chromosome.resetCodonCounter();
                 if(counter <= maxTrainingCounter){
-                    rawFitness += Math.abs(m.get(-1) - expression(chromosome, m));
+                    rawFitness += Math.abs(m.get(-1) - expression(chromosome, m, 0));
                 }
                 else
                     break;
+                counter++;
             }  
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,13 +142,14 @@ public class GE {
 
     /**
      * True is for training data, false is for test data
-     * @param type
+     * @param type True=training, False=test
      */
     private Chromosome evaluatePopulation(boolean type){
         Chromosome bestChromosome = null;
         int counter = 0;
         for(Chromosome chromosome: population){
             double fitness = evaluateIndividual(chromosome, type);
+            // System.out.println("Just after evaluate individual function call: " + fitness);
             if(counter == 0){
                 bestChromosome = chromosome;
                 counter++;
@@ -191,6 +202,10 @@ public class GE {
         System.gc();//clear memory
     }
 
+    public LinkedHashSet<Chromosome> getPopulation(){
+        return this.population;
+    }
+
     public void executeTraining(){
         int counter = 0;
         generateInitialPopulation();
@@ -202,6 +217,8 @@ public class GE {
             //evaluate fitness of offspring
             //replace all individuals in the population with offspring
             generateNewPopulation();
+            best = evaluatePopulation(true);
+            System.out.println("Raw fitness: " + best.getRawFitness());
         }
     }
 }
