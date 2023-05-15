@@ -14,6 +14,8 @@ public class GE {
     private LinkedHashSet<Chromosome> population;
     private final String filename = "150kData.csv";
     private LinkedHashSet<Map<Integer, Double>> dataset;
+    private final TournamentSelection tournament;
+
 
     public GE(Random random, int populationSize, double mutationRate, double crossoverRate, int lowerLengthLimit, int upperLengthLimit, int tournamentSize,
                 int maxGenerations){
@@ -29,6 +31,7 @@ public class GE {
         DataReader reader = new DataReader(filename);
         reader.readData();
 
+        tournament = new TournamentSelection(tournamentSize, random);
         dataset = reader.getDataset();
     }
 
@@ -99,7 +102,7 @@ public class GE {
     }
 
     //type represents a boolean value for whether trainig data or test data. true = training data, false = test data
-    public void evaluateIndividual(Chromosome chromosome, boolean type){
+    public double evaluateIndividual(Chromosome chromosome, boolean type){
         //note as you are running through the training/test data for the individual you want to reset the codonCounter
         //in chromosome to zero so that the same individual is always produced.
 
@@ -122,18 +125,83 @@ public class GE {
         }
         
         //either return the raw fitness or an array containing all the performance metrics
+        //alternatively you can just store those values in the chromosome
+        chromosome.setRawFitness(rawFitness);
+        return rawFitness;
     }
 
-    
-
-    public void execute(){
+    /**
+     * True is for training data, false is for test data
+     * @param type
+     */
+    private Chromosome evaluatePopulation(boolean type){
+        Chromosome bestChromosome = null;
         int counter = 0;
+        for(Chromosome chromosome: population){
+            double fitness = evaluateIndividual(chromosome, type);
+            if(counter == 0){
+                bestChromosome = chromosome;
+                counter++;
+            }
+            else{
+                if(fitness < bestChromosome.getRawFitness())//can change this to RSquared maybe later
+                    bestChromosome = chromosome;
+            }
+        }
 
-        while(counter < maxGenerations){
+        return bestChromosome;
+    }
+
+    private void generateNewPopulation(){
+        LinkedHashSet<Chromosome> newPopulation = new LinkedHashSet<Chromosome>();
+
+        int crossoverEnd = (int)(crossoverRate * populationSize);
+
+        //create new population with crossover
+        Chromosome[] pop = population.toArray(new Chromosome[population.size()]);
+        for(int i=0;i<crossoverEnd;i++){
+            Chromosome one = tournament.selectIndividual(pop);
+            Chromosome two = tournament.selectIndividual(pop);
+
+            int shortestChromosomeLength = (one.getChromosomeLength() <= two.getChromosomeLength()) ? 
+                                            (one.getChromosomeLength()) :(two.getChromosomeLength());
+
+            int crossoverIndex = random.nextInt(shortestChromosomeLength-1);
+
+            Chromosome offSpringOne = one.clone();
+            offSpringOne.crossover(two.clone(), crossoverIndex);
+
+            Chromosome offSpringTwo = two.clone();
+            offSpringTwo.crossover(one.clone(), crossoverIndex);
+
+            newPopulation.add(offSpringOne);
+            newPopulation.add(offSpringTwo);
+
+        }
+
+        //create rest of population with mutation
+        for(int i=crossoverEnd;i<populationSize;i++){
+            Chromosome one = tournament.selectIndividual(pop);
+            Chromosome offSpringOne = one.clone();
+            offSpringOne.mutate();
+            newPopulation.add(offSpringOne);
+        }
+
+        population = newPopulation;
+        System.gc();//clear memory
+    }
+
+    public void executeTraining(){
+        int counter = 0;
+        generateInitialPopulation();
+        //evaluate fitness of the population
+        Chromosome best = evaluatePopulation(true);
+        while(best.getRawFitness() < 500000 || counter < maxGenerations){
             //select individuals for mating
             //recombine individuals
             //evaluate fitness of offspring
             //replace all individuals in the population with offspring
+            generateNewPopulation();
         }
     }
 }
