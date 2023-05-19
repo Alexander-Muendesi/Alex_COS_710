@@ -80,36 +80,58 @@ public class GE {
         }
     }
 
+    private static int codonCounter = 0;
     public double expression(Chromosome c, Map<Integer, Double> data, int codonIndex) throws Exception{
-        // for(Codon cc: c.getChromosome())
-            // System.out.print(cc.getDenaryValue() + " ");
 
-        codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
+        // codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
+        codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
 
-        Codon codon = c.getCodon(codonIndex);
-        // System.out.println("codon value: " + codon.getDenaryValue() + " codon index: " + codonIndex);
-        // int productionRule = codon.getDenaryValue() % 2;
-        int productionRule = codon.getDenaryValue() % 3;
+        // Codon codon = c.getCodon(codonIndex);
+        Codon codon = c.getCodon(codonCounter++);
+        // System.out.println("codon value: " + codon.getDenaryValue() + " codon index: " + codonCounter);
+        int productionRule = codon.getDenaryValue() % 2;
+        // int productionRule = codon.getDenaryValue() % 3;
 
         // System.out.println("\n ProductionRule: " + productionRule);
-        if(productionRule == 0){
+        if(productionRule == 0){//<expr> op <function>
             //call expression
             // System.out.println("In rule 0");
             double left = expression(c, data, codonIndex+1);
+
             //call operator
-            char  op = operator(c.getCodon(codonIndex));
+            // char  op = operator(c.getCodon(codonIndex));
+            codonCounter++;
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            char  op = operator(c.getCodon(codonCounter));
             //call expression again
-            double right = expression(c, data, codonIndex+1);
+            // double right = expression(c, data, codonIndex+1);
+            double right = function(codon, c.getCodon(codonCounter), data);
+
             // System.out.println("after right");
             return applyOperator(left,right,op);
         }
-        else if(productionRule == 1){
-            codonIndex++;
-            codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
+        /*else if(productionRule == 1){//<function> op <expression>
+            // codonIndex++;
+            // codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
+            codonCounter++;
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            double left = function(codon, c.getCodon(codonCounter), data);
 
+            codonCounter++;
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            char  op = operator(c.getCodon(codonCounter));
 
-            return function(codon, c.getCodon(codonIndex), data);
-        }
+            codonCounter++;
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            double right = expression(c, data, codonIndex+1);
+
+            return applyOperator(left,right,op);
+
+            // return function(codon, c.getCodon(codonCounter), data);
+            // return function(codon, c.getCodon(codonIndex), data);
+            // double left = function(codon, c.getCodon(codonIndex), data);
+            // char op = operator(codon)
+        }*/
         else{
             return terminal(c.getCodon(codonIndex), data);
         }
@@ -192,6 +214,7 @@ public class GE {
                 for(Map<Integer,Double> m: dataset){
                     chromosome.resetCodonCounter();
                     if(counter <= maxTrainingCounter){
+                        codonCounter = 0;
                         double predictedVal = expression(chromosome, m, 0);
                         rawFitness += Math.abs(m.get(-1) - predictedVal);
                         if(best){
@@ -202,8 +225,9 @@ public class GE {
                             rSquared.calcTss(m.get(-1));
                         }
                     }
-                    else
+                    else{
                         break;
+                    }
                     counter++;
                 }  
             } catch (Exception e) {
@@ -215,7 +239,16 @@ public class GE {
                 for(Map<Integer,Double> m: dataset){
                     chromosome.resetCodonCounter();
                     if(counter >= maxTrainingCounter){
-                        rawFitness += Math.abs(m.get(-1) - expression(chromosome, m, 0));
+                        double predictedVal = expression(chromosome, m, 0);
+                        rawFitness += Math.abs(m.get(-1) - predictedVal);
+
+                        if(best){
+                            mae.calcDiff(m.get(-1), predictedVal);
+                            mDev.calcAbsValue(m.get(-1), predictedVal);
+                            rmsd.sumSqauredDifference(m.get(-1), predictedVal);
+                            rSquared.calcRss(m.get(-1), predictedVal);
+                            rSquared.calcTss(m.get(-1));
+                        }
                     }
                     counter++;
                 }
@@ -249,6 +282,8 @@ public class GE {
                 if(fitness < bestChromosome.getRawFitness())//can change this to RSquared maybe later
                     bestChromosome = chromosome;
             }
+            // System.out.println(counter + ": CodonCounter: " + codonCounter);
+            counter++;
         }
 
         evaluateIndividual(bestChromosome, type, true);
@@ -344,6 +379,7 @@ public class GE {
             generateNewPopulation();
             best = evaluatePopulation(true);
             System.out.println(counter + ": Raw fitness: " + best.getRawFitness());
+            
             counter++;
         }
 

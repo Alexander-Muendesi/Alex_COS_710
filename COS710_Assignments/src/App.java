@@ -10,13 +10,13 @@ public class App {
         // String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         String filename = "150kData.csv";
         int populationSize = 100;
-        int seed = 7877541;
-        int numGenerations = 100;
-        double mutationRate = 0.5;
-        double crossoverRate = 0.5;
+        int seed = 2;
+        int numGenerations = 50;
+        double mutationRate = 0.1;
+        double crossoverRate = 0.9;
         int tournamentSize = 4;
-        int chromosomeLengthUpperLimit = 12;//there is 24 terminals overall
-        int chromosomeLengthLowerLimit = 10;//was 10 before
+        int chromosomeLengthUpperLimit = 50;//there is 24 terminals overall
+        int chromosomeLengthLowerLimit = 5;//was 10 before
         Random random = new Random(seed);
 
         GE ge = new GE(random, populationSize, mutationRate, crossoverRate, chromosomeLengthLowerLimit, chromosomeLengthUpperLimit, tournamentSize, numGenerations);

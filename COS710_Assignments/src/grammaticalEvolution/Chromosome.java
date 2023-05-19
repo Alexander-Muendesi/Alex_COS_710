@@ -10,7 +10,7 @@ public class Chromosome {
     private int maxNumCodons;
     private List<Codon> chromosome;
     private final int CODON_LENGTH = 8;
-    private int codonCounter = 0;
+    private static int codonCounter = 0;
     private double rawFitness = Double.MAX_VALUE;
 
     public Chromosome(Random random, int numCodons, int maxNumCodons){
@@ -94,16 +94,16 @@ public class Chromosome {
         return new Chromosome(random, c, numCodons, maxNumCodons);
     }
 
-    // public Codon getCodon(){
-    //     if(codonCounter < chromosome.size()){
-    //         System.out.println("Codon counter: " + codonCounter + " size: " + chromosome.size());
-    //         return chromosome.get(codonCounter++);
-    //     }
-    //     else{
-    //         codonCounter=0;
-    //         return chromosome.get(codonCounter);
-    //     }
-    // }
+    public Codon getCodon(){
+        if(codonCounter < chromosome.size()){
+            System.out.println("Codon counter: " + codonCounter + " size: " + chromosome.size());
+            return chromosome.get(codonCounter++);
+        }
+        else{
+            codonCounter=0;
+            return chromosome.get(codonCounter);
+        }
+    }
 
     public Codon getCodon(int index){
         return chromosome.get(index);
