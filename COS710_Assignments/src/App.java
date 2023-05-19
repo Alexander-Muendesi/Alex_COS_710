@@ -9,13 +9,13 @@ public class App {
         // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         // String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         String filename = "150kData.csv";
-        int populationSize = 50;
-        int seed = 0;
-        int numGenerations = 150;
-        double mutationRate = 0.70;
-        double crossoverRate = 0.30;
+        int populationSize = 10;
+        int seed = 7877541;
+        int numGenerations = 100;
+        double mutationRate = 0.5;
+        double crossoverRate = 0.5;
         int tournamentSize = 4;
-        int chromosomeLengthUpperLimit = 15;//there is 24 terminals overall
+        int chromosomeLengthUpperLimit = 12;//there is 24 terminals overall
         int chromosomeLengthLowerLimit = 10;//was 10 before
         Random random = new Random(seed);
 

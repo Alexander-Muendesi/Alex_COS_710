@@ -53,6 +53,7 @@ public class Chromosome {
     }
 
     public void crossover(Chromosome secondParent, int crossoverIndex){
+
         List<Codon> currSublist = new ArrayList<>(this.chromosome.subList(0, crossoverIndex+1));
         List<Codon> secondTail = new ArrayList<>(secondParent.getChromosome().subList(crossoverIndex+1, secondParent.getChromosomeLength()));
 
@@ -62,6 +63,7 @@ public class Chromosome {
             chromosome = new ArrayList<>(currSublist.subList(0, maxNumCodons+1));
         else
             chromosome = currSublist;
+
     }
 
     public int getChromosomeLength(){
@@ -98,5 +100,17 @@ public class Chromosome {
 
     public void resetCodonCounter(){
         codonCounter = 0;
+    }
+
+    public void printChromosome(){
+        for(Codon c: chromosome)
+            System.out.print(c.getDenaryValue() + " ");
+        System.out.println();
+    }
+
+    public void printChromosome(List<Codon> chr){
+        for(Codon c: chr)
+            System.out.print(c.getDenaryValue() + " ");
+        System.out.println();
     }
 }
