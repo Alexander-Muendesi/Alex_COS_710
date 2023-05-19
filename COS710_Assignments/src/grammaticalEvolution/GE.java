@@ -82,58 +82,31 @@ public class GE {
 
     private static int codonCounter = 0;
     public double expression(Chromosome c, Map<Integer, Double> data, int codonIndex) throws Exception{
-
-        // codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
         codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
 
-        // Codon codon = c.getCodon(codonIndex);
         Codon codon = c.getCodon(codonCounter++);
-        // System.out.println("codon value: " + codon.getDenaryValue() + " codon index: " + codonCounter);
         int productionRule = codon.getDenaryValue() % 2;
-        // int productionRule = codon.getDenaryValue() % 3;
 
-        // System.out.println("\n ProductionRule: " + productionRule);
         if(productionRule == 0){//<expr> op <function>
             //call expression
-            // System.out.println("In rule 0");
             double left = expression(c, data, codonIndex+1);
 
             //call operator
-            // char  op = operator(c.getCodon(codonIndex));
             codonCounter++;
             codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
-            char  op = operator(c.getCodon(codonCounter));
-            //call expression again
-            // double right = expression(c, data, codonIndex+1);
+            char  op = operator(c.getCodon(codonCounter++));
+            //call function
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            codon = c.getCodon(codonIndex++);
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
             double right = function(codon, c.getCodon(codonCounter), data);
 
-            // System.out.println("after right");
             return applyOperator(left,right,op);
         }
-        /*else if(productionRule == 1){//<function> op <expression>
-            // codonIndex++;
-            // codonIndex = (codonIndex < c.getChromosomeLength()) ? codonIndex : codonIndex % c.getChromosomeLength();
-            codonCounter++;
-            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
-            double left = function(codon, c.getCodon(codonCounter), data);
-
-            codonCounter++;
-            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
-            char  op = operator(c.getCodon(codonCounter));
-
-            codonCounter++;
-            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
-            double right = expression(c, data, codonIndex+1);
-
-            return applyOperator(left,right,op);
-
-            // return function(codon, c.getCodon(codonCounter), data);
-            // return function(codon, c.getCodon(codonIndex), data);
-            // double left = function(codon, c.getCodon(codonIndex), data);
-            // char op = operator(codon)
-        }*/
         else{
-            return terminal(c.getCodon(codonIndex), data);
+            codonCounter = (codonCounter < c.getChromosomeLength()) ? codonCounter : codonCounter % c.getChromosomeLength();
+            return terminal(c.getCodon(codonCounter++), data);
+            // return terminal(c.getCodon(codonIndex), data);
         }
     }
 
