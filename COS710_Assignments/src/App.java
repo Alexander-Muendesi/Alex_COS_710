@@ -9,7 +9,7 @@ public class App {
         // String filename = "Alex_COS_710/COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         // String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         String filename = "150kData.csv";
-        int populationSize = 10;
+        int populationSize = 100;
         int seed = 7877541;
         int numGenerations = 100;
         double mutationRate = 0.5;

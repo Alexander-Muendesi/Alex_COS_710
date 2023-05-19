@@ -66,6 +66,17 @@ public class Chromosome {
 
     }
 
+    public void crossover(Chromosome secondParent, int smallestIndex, int largetIndex){
+        List<Codon> currSublist = new ArrayList<>(this.chromosome.subList(0, smallestIndex+1));
+        currSublist.addAll(new ArrayList<>(secondParent.getChromosome().subList(smallestIndex+1, largetIndex+1)));
+        currSublist.addAll(new ArrayList<>(this.chromosome.subList(largetIndex+1, this.chromosome.size())));
+
+        if(currSublist.size() > maxNumCodons)//trim the excess of if it exceeds the max codon length
+            chromosome = new ArrayList<>(currSublist.subList(0, maxNumCodons+1));
+        else
+            chromosome = currSublist;
+    }
+
     public int getChromosomeLength(){
         return this.chromosome.size();
     }
