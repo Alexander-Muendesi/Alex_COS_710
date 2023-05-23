@@ -356,6 +356,26 @@ public class GE {
             counter++;
         }
 
+        System.out.println("\nTrain data");
+        System.out.println("MAE: " + mae.getMae());
+        System.out.println("Median Absolute Deviation: "+mDev.getMedianValue());
+        
+        System.out.println("RMSD: " +rmsd.calcFinalResult());
+        System.out.println("RSquared: " + rSquared.calcRSquared());
+
+        executeTest(best);
+    }
+
+    public void executeTest(Chromosome best){
+        datasetAverage = calcDatasetAverage(false);
+        mae = new MAE();
+        mDev = new MedianAbsoluteDev(datasetAverage);
+        rmsd = new RMSD();
+        rSquared = new RSquared(datasetAverage);
+
+        evaluateIndividual(best, false, true);
+
+        System.out.println("\nTest data");
         System.out.println("MAE: " + mae.getMae());
         System.out.println("Median Absolute Deviation: "+mDev.getMedianValue());
         
