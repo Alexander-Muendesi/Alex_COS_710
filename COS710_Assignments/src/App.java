@@ -10,7 +10,7 @@ public class App {
         // String filename = "COS710_Assignments/src/dataset_reading_classes/150kData.csv";
         String filename = "150kData.csv";
         int populationSize = 100;//was 100
-        int seed = 47;
+        int seed = 22;
         int numGenerations = 50;
         double mutationRate = 0.1;
         double crossoverRate = 0.9;
@@ -21,11 +21,6 @@ public class App {
 
         GE ge = new GE(random, populationSize, mutationRate, crossoverRate, chromosomeLengthLowerLimit, chromosomeLengthUpperLimit, tournamentSize, numGenerations);
         ge.executeTraining();
-        // ge.generateInitialPopulation();
-        // for(Chromosome s: ge.getPopulation()){
-        //     for(Codon c: s.getChromosome())
-        //         System.out.print(c.getDenaryValue() + " ");
-        //     System.out.println();
-        // }
+        
     }
 }

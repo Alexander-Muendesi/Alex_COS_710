@@ -351,7 +351,7 @@ public class GE {
             //replace all individuals in the population with offspring
             generateNewPopulation();
             best = evaluatePopulation(true);
-            System.out.println(counter + ": Raw fitness: " + best.getRawFitness());
+            // System.out.println(counter + ": Raw fitness: " + best.getRawFitness());
             
             counter++;
         }
