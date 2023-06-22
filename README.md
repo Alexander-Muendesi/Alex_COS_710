@@ -14,4 +14,4 @@ This branch contains a structure based GP implementation
 This branch contains a Grammatical Evolution genetic program to solve the Seoul Bike Trip duration problem
 
 # Running the program
-This code was created in VS Code. The Java Project makes use of no build tools and can be run by clicking the run button on the top right of VS Code.
+This code was created in VS Code. The Java Project makes use of no build tools and can be run by opening App.java and then clicking the run button on the top right of VS Code.
